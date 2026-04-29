@@ -17,21 +17,30 @@ export function SubmissionForm() {
     v2: emptyDraft(),
     v3: emptyDraft(),
   });
+  const [visibleCount, setVisibleCount] = useState<1 | 2 | 3>(1);
+
+  const visibleLabels = (['v1', 'v2', 'v3'] as VersionLabel[]).slice(0, visibleCount);
 
   function update(label: VersionLabel, field: keyof DraftVersion, value: string) {
     setVersions((v) => ({ ...v, [label]: { ...v[label], [field]: value } }));
   }
 
+  function removeLastVersion() {
+    const lastLabel = visibleLabels[visibleLabels.length - 1];
+    if (lastLabel === 'v1') return;
+    setVersions((v) => ({ ...v, [lastLabel]: emptyDraft() }));
+    setVisibleCount((c) => (c - 1) as 1 | 2 | 3);
+  }
+
   const v1HasPrompt = versions.v1.prompt.trim().length > 0;
-  // Orphan result: result without a prompt makes no sense — flag it.
-  const v1Orphan = !v1HasPrompt && versions.v1.result.trim().length > 0;
-  const v2Orphan = versions.v2.prompt.trim() === '' && versions.v2.result.trim() !== '';
-  const v3Orphan = versions.v3.prompt.trim() === '' && versions.v3.result.trim() !== '';
-  const hasOrphan = v1Orphan || v2Orphan || v3Orphan;
+  // Orphan result: result without a prompt makes no sense — only check visible versions.
+  const hasOrphan = visibleLabels.some(
+    (l) => versions[l].prompt.trim() === '' && versions[l].result.trim() !== ''
+  );
   const canSubmit = name.trim() && v1HasPrompt && !hasOrphan;
 
   function submit() {
-    const collected: PromptVersion[] = (['v1', 'v2', 'v3'] as VersionLabel[])
+    const collected: PromptVersion[] = visibleLabels
       .filter((l) => versions[l].prompt.trim().length > 0)
       .map((l) => ({
         label: l,
@@ -56,8 +65,9 @@ export function SubmissionForm() {
         />
       </div>
 
-      {(['v1', 'v2', 'v3'] as VersionLabel[]).map((label) => {
+      {visibleLabels.map((label, idx) => {
         const required = label === 'v1';
+        const canRemove = !required && idx === visibleLabels.length - 1;
         return (
           <div
             key={label}
@@ -72,9 +82,20 @@ export function SubmissionForm() {
                 {required ? (
                   <span className="text-xs font-semibold text-rose-500">프롬프트 필수</span>
                 ) : (
-                  <span className="text-xs text-slate-400">선택</span>
+                  <span className="text-xs text-slate-400">개선 이력</span>
                 )}
               </h3>
+              {canRemove && (
+                <button
+                  type="button"
+                  data-component="remove-version-button"
+                  onClick={removeLastVersion}
+                  aria-label={`${label.toUpperCase()} 제거`}
+                  className="flex items-center gap-1 rounded-full border border-slate-200 px-2 py-0.5 text-xs text-slate-500 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600"
+                >
+                  <span aria-hidden="true">×</span> 제거
+                </button>
+              )}
             </div>
 
             <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -132,6 +153,17 @@ export function SubmissionForm() {
           </div>
         );
       })}
+
+      {visibleCount < 3 && (
+        <button
+          type="button"
+          data-component="add-version-button"
+          onClick={() => setVisibleCount((c) => (c + 1) as 1 | 2 | 3)}
+          className="w-full rounded-2xl border-2 border-dashed border-sky-200 bg-white/40 py-5 text-sm font-semibold text-sky-600 transition-colors hover:border-sky-400 hover:bg-sky-50 hover:text-sky-700"
+        >
+          + 개선 이력 추가 (v{visibleCount + 1})
+        </button>
+      )}
 
       {hasOrphan && (
         <p className="text-sm font-medium text-rose-600">
