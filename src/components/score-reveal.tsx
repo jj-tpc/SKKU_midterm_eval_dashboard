@@ -7,7 +7,7 @@ import { Chatbot } from './chatbot';
 import { SpeechBubble } from './speech-bubble';
 import { SCORE_MAX, type ScoreCategory } from '@/types';
 
-const ORDER: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'presentation', 'creativity'];
+const ORDER: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'creativity'];
 
 function fallbackMessage(total: number): string {
   if (total >= 90) return '대단해요! 무대 위 별처럼 빛났어요.';
@@ -134,7 +134,7 @@ export function ScoreReveal() {
 
       {/* RIGHT — top: score cards, bottom: chatbot + bubble */}
       <div className="flex flex-col gap-8 min-w-0">
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
           {ORDER.map((cat) => {
             const s = state.scores[cat];
             if (!s) return (

@@ -4,12 +4,13 @@ import type { CategoryScore, Group, ScoreCategory } from '@/types';
 import { SCORE_MAX } from '@/types';
 
 const LABELS: Record<ScoreCategory, string> = {
-  promptDesign: '프롬프트 설계 품질',
-  outputQuality: '출력 결과 품질',
-  iteration: '반복 개선 과정',
-  presentation: '발표 및 시연',
-  creativity: '창의성 및 전공 연결',
+  promptDesign: '프롬프트 설계',
+  outputQuality: '출력 결과',
+  iteration: '반복 개선',
+  creativity: '창의성·전공',
 };
+
+const ORDER: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'creativity'];
 
 type Args = {
   group: Group;
@@ -19,8 +20,7 @@ type Args = {
 };
 
 export async function generateCheerMessage({ group, totalScore, scores, apiKey }: Args) {
-  const order: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'presentation', 'creativity'];
-  const breakdown = order
+  const breakdown = ORDER
     .map((c) => `- ${LABELS[c]} (${scores[c].score}/${SCORE_MAX[c]}): ${scores[c].reasoning}`)
     .join('\n');
 

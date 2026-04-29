@@ -15,31 +15,28 @@ export type Submission = {
   versions: PromptVersion[];
 };
 
-export type QuestionSource = 'common' | 'dynamic';
+export type ScoreCategory =
+  | 'promptDesign'
+  | 'outputQuality'
+  | 'iteration'
+  | 'creativity';
+
+export const SCORE_MAX: Record<ScoreCategory, number> = {
+  promptDesign: 30,
+  outputQuality: 25,
+  iteration: 25,
+  creativity: 20,
+};
 
 export type ChatbotQAItem = {
-  source: QuestionSource;
+  /** Which rubric category this question is meant to surface signal for. */
+  category: ScoreCategory;
   question: string;
   answer: string;
 };
 
 export type ChatbotQA = {
   questions: ChatbotQAItem[];
-};
-
-export type ScoreCategory =
-  | 'promptDesign'
-  | 'outputQuality'
-  | 'iteration'
-  | 'presentation'
-  | 'creativity';
-
-export const SCORE_MAX: Record<ScoreCategory, number> = {
-  promptDesign: 30,
-  outputQuality: 20,
-  iteration: 20,
-  presentation: 15,
-  creativity: 15,
 };
 
 export type CategoryScore = {

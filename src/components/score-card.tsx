@@ -14,7 +14,6 @@ const META: Record<ScoreCategory, CategoryMeta> = {
   promptDesign:  { label: '프롬프트 설계', accent: 'oklch(0.62 0.27 350)', tint: 'oklch(0.97 0.025 350)' }, // magenta
   outputQuality: { label: '출력 결과',     accent: 'oklch(0.7 0.18 220)',  tint: 'oklch(0.96 0.04 220)'  }, // cyan
   iteration:     { label: '반복 개선',     accent: 'oklch(0.78 0.20 75)',  tint: 'oklch(0.97 0.06 80)'   }, // amber-yellow
-  presentation:  { label: '발표 시연',     accent: 'oklch(0.65 0.24 305)', tint: 'oklch(0.96 0.05 305)'  }, // violet
   creativity:    { label: '창의성·전공',   accent: 'oklch(0.72 0.20 0)',   tint: 'oklch(0.96 0.05 0)'    }, // hot pink
 };
 
@@ -85,7 +84,9 @@ export function ScoreCard({ category, score, max, reasoning, status }: Props) {
       </div>
 
       {status === 'success' && reasoning && (
-        <p className="mt-3 text-xs leading-relaxed text-(--color-ink-soft) line-clamp-3">{reasoning}</p>
+        <p className="mt-3 text-xs leading-relaxed text-(--color-ink-soft) break-words whitespace-pre-line">
+          {reasoning}
+        </p>
       )}
       {status === 'error' && (
         <p className="mt-3 text-xs leading-relaxed text-(--color-danger)">채점 일시 오류 — 다시 시도해 주세요.</p>

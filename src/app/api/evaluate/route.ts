@@ -1,16 +1,17 @@
 import { evaluatePromptDesign } from '@/lib/evaluators/evaluate-prompt-design';
 import { evaluateOutputQuality } from '@/lib/evaluators/evaluate-output-quality';
 import { evaluateIteration } from '@/lib/evaluators/evaluate-iteration';
-import { evaluatePresentation } from '@/lib/evaluators/evaluate-presentation';
 import { evaluateCreativity } from '@/lib/evaluators/evaluate-creativity';
 import { generateCheerMessage } from '@/lib/evaluators/generate-cheer-message';
 import { getCachedEvaluation, setCachedEvaluation } from '@/lib/kv-cache';
 import { DEFAULT_MODEL } from '@/lib/run-evaluator';
 import { SCORE_MAX } from '@/types';
-import type { ChatbotQA, EvaluationResult, Group, ScoreCategory, Submission } from '@/types';
+import type { ChatbotQA, ChatbotQAItem, EvaluationResult, Group, ScoreCategory, Submission } from '@/types';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
+
+const ORDER: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'creativity'];
 
 type Body = {
   group: Group;
@@ -24,6 +25,10 @@ function sse(event: string, data: unknown): string {
 }
 
 function sleep(ms: number) { return new Promise((r) => setTimeout(r, ms)); }
+
+function pickQA(qa: ChatbotQA, category: ScoreCategory): ChatbotQAItem | undefined {
+  return qa.questions.find((q) => q.category === category);
+}
 
 export async function POST(req: Request) {
   const apiKey = req.headers.get('x-openai-key');
@@ -43,8 +48,7 @@ export async function POST(req: Request) {
         send('cache-status', { hit: !!cached });
 
         if (cached) {
-          const order: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'presentation', 'creativity'];
-          for (const cat of order) {
+          for (const cat of ORDER) {
             const s = cached.scores[cat];
             send('score', { category: cat, score: s.score, max: s.max, reasoning: s.reasoning, status: 'success' });
             await sleep(500);
@@ -58,11 +62,10 @@ export async function POST(req: Request) {
         }
 
         const tasks: Array<{ category: ScoreCategory; promise: Promise<{ score: number; reasoning: string }> }> = [
-          { category: 'promptDesign',  promise: evaluatePromptDesign(body.submission, apiKey) },
-          { category: 'outputQuality', promise: evaluateOutputQuality(body.submission, apiKey) },
-          { category: 'iteration',     promise: evaluateIteration(body.submission, apiKey) },
-          { category: 'presentation',  promise: evaluatePresentation(body.chatbotQA, apiKey) },
-          { category: 'creativity',    promise: evaluateCreativity(body.submission, apiKey) },
+          { category: 'promptDesign',  promise: evaluatePromptDesign(body.submission,  pickQA(body.chatbotQA, 'promptDesign'),  apiKey) },
+          { category: 'outputQuality', promise: evaluateOutputQuality(body.submission, pickQA(body.chatbotQA, 'outputQuality'), apiKey) },
+          { category: 'iteration',     promise: evaluateIteration(body.submission,     pickQA(body.chatbotQA, 'iteration'),     apiKey) },
+          { category: 'creativity',    promise: evaluateCreativity(body.submission,    pickQA(body.chatbotQA, 'creativity'),    apiKey) },
         ];
 
         const results: Partial<Record<ScoreCategory, { score: number; reasoning: string; ok: boolean }>> = {};
@@ -80,8 +83,7 @@ export async function POST(req: Request) {
         await Promise.all(wrapped);
 
         const allOk = Object.values(results).every((r) => r!.ok);
-        const total = (['promptDesign', 'outputQuality', 'iteration', 'presentation', 'creativity'] as ScoreCategory[])
-          .reduce((sum, c) => sum + (results[c]?.score ?? 0), 0);
+        const total = ORDER.reduce((sum, c) => sum + (results[c]?.score ?? 0), 0);
         const evaluatedAt = new Date().toISOString();
 
         send('complete', { totalScore: total, evaluatedAt });
@@ -90,7 +92,6 @@ export async function POST(req: Request) {
           promptDesign:  { score: results.promptDesign!.score,  max: SCORE_MAX.promptDesign,  reasoning: results.promptDesign!.reasoning },
           outputQuality: { score: results.outputQuality!.score, max: SCORE_MAX.outputQuality, reasoning: results.outputQuality!.reasoning },
           iteration:     { score: results.iteration!.score,     max: SCORE_MAX.iteration,     reasoning: results.iteration!.reasoning },
-          presentation:  { score: results.presentation!.score,  max: SCORE_MAX.presentation,  reasoning: results.presentation!.reasoning },
           creativity:    { score: results.creativity!.score,    max: SCORE_MAX.creativity,    reasoning: results.creativity!.reasoning },
         };
 

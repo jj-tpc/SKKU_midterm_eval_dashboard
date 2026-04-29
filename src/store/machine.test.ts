@@ -1,8 +1,22 @@
 import { describe, it, expect } from 'vitest';
-import { initialState, reducer } from './machine';
+import { initialState, reducer, type CategoryQuestion } from './machine';
 import type { Submission, ChatbotQAItem } from '@/types';
 
 const sub: Submission = { group: '그룹1', versions: [{ label: 'v1', prompt: 'p', result: 'r' }] };
+
+const fourQuestions: CategoryQuestion[] = [
+  { category: 'promptDesign',  question: 'q1' },
+  { category: 'outputQuality', question: 'q2' },
+  { category: 'iteration',     question: 'q3' },
+  { category: 'creativity',    question: 'q4' },
+];
+
+const fourQA: ChatbotQAItem[] = [
+  { category: 'promptDesign',  question: 'q1', answer: 'a1' },
+  { category: 'outputQuality', question: 'q2', answer: 'a2' },
+  { category: 'iteration',     question: 'q3', answer: 'a3' },
+  { category: 'creativity',    question: 'q4', answer: 'a4' },
+];
 
 describe('eval machine reducer', () => {
   it('starts in idle', () => {
@@ -29,29 +43,22 @@ describe('eval machine reducer', () => {
     expect(s1.submission).toEqual(sub);
   });
 
-  it('qa -> grading on SUBMIT_QA', () => {
+  it('qa -> grading on SUBMIT_QA carries 4 category-tagged answers', () => {
     let s = reducer(initialState, { type: 'SELECT_GROUP', payload: '그룹1' });
     s = reducer(s, { type: 'SUBMIT_FORM', payload: sub });
-    s = reducer(s, { type: 'SET_QUESTIONS', payload: ['q1', 'q2', 'q3'] });
-    const items: ChatbotQAItem[] = [
-      { source: 'common',  question: 'q1', answer: 'a1' },
-      { source: 'dynamic', question: 'q2', answer: 'a2' },
-      { source: 'dynamic', question: 'q3', answer: 'a3' },
-    ];
-    s = reducer(s, { type: 'SUBMIT_QA', payload: items });
+    s = reducer(s, { type: 'SET_QUESTIONS', payload: fourQuestions });
+    s = reducer(s, { type: 'SUBMIT_QA', payload: fourQA });
     expect(s.phase).toBe('grading');
-    expect(s.chatbotQA.questions).toHaveLength(3);
+    expect(s.chatbotQA.questions).toHaveLength(4);
+    expect(s.chatbotQA.questions[0].category).toBe('promptDesign');
+    expect(s.chatbotQA.questions[3].category).toBe('creativity');
   });
 
   it('grading -> reveal on RECEIVE_SCORE updates running totals', () => {
     let s = reducer(initialState, { type: 'SELECT_GROUP', payload: '그룹1' });
     s = reducer(s, { type: 'SUBMIT_FORM', payload: sub });
-    s = reducer(s, { type: 'SET_QUESTIONS', payload: ['q1', 'q2', 'q3'] });
-    s = reducer(s, { type: 'SUBMIT_QA', payload: [
-      { source: 'common',  question: 'q1', answer: 'a' },
-      { source: 'dynamic', question: 'q2', answer: 'a' },
-      { source: 'dynamic', question: 'q3', answer: 'a' },
-    ]});
+    s = reducer(s, { type: 'SET_QUESTIONS', payload: fourQuestions });
+    s = reducer(s, { type: 'SUBMIT_QA', payload: fourQA });
     s = reducer(s, { type: 'RECEIVE_SCORE', payload: { category: 'promptDesign', score: 25, max: 30, reasoning: 'r', status: 'success' } });
     expect(s.phase).toBe('reveal');
     expect(s.scores.promptDesign).toBeDefined();

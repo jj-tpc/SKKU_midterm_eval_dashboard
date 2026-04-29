@@ -4,11 +4,16 @@ export type Phase = 'idle' | 'input' | 'qa' | 'grading' | 'reveal' | 'done';
 
 export type StoredScore = CategoryScore & { status: 'success' | 'error' };
 
+export type CategoryQuestion = {
+  category: ScoreCategory;
+  question: string;
+};
+
 export type State = {
   phase: Phase;
   group: Group | null;
   submission: Submission | null;
-  questions: string[];
+  questions: CategoryQuestion[];
   chatbotQA: ChatbotQA;
   scores: Partial<Record<ScoreCategory, StoredScore>>;
   totalScore: number | null;
@@ -37,7 +42,7 @@ export type Action =
   | { type: 'SELECT_GROUP'; payload: Group }
   | { type: 'SET_FORCE_REFRESH'; payload: boolean }
   | { type: 'SUBMIT_FORM'; payload: Submission }
-  | { type: 'SET_QUESTIONS'; payload: string[] }
+  | { type: 'SET_QUESTIONS'; payload: CategoryQuestion[] }
   | { type: 'SUBMIT_QA'; payload: ChatbotQAItem[] }
   | { type: 'CACHE_STATUS'; payload: boolean }
   | { type: 'RECEIVE_SCORE'; payload: { category: ScoreCategory; score: number; max: number; reasoning: string; status: 'success' | 'error' } }

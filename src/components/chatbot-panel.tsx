@@ -4,7 +4,14 @@ import { useEval } from '@/store/eval-context';
 import { useApiKey } from '@/hooks/use-api-key';
 import { Chatbot } from './chatbot';
 import { SpeechBubble } from './speech-bubble';
-import type { ChatbotQAItem } from '@/types';
+import type { ChatbotQAItem, ScoreCategory } from '@/types';
+
+const CATEGORY_LABEL: Record<ScoreCategory, string> = {
+  promptDesign: '프롬프트 설계',
+  outputQuality: '출력 결과',
+  iteration: '반복 개선',
+  creativity: '창의성·전공',
+};
 
 export function ChatbotPanel() {
   const { state, dispatch } = useEval();
@@ -32,7 +39,7 @@ export function ChatbotPanel() {
         });
         const data = await res.json();
         if (cancelled) return;
-        if (!Array.isArray(data.questions) || data.questions.length !== 3) {
+        if (!Array.isArray(data.questions) || data.questions.length !== 4) {
           throw new Error('invalid questions response');
         }
         dispatch({ type: 'SET_QUESTIONS', payload: data.questions });
@@ -66,7 +73,7 @@ export function ChatbotPanel() {
     );
   }
 
-  const currentQ = state.questions[idx];
+  const current = state.questions[idx];
   const isLast = idx === state.questions.length - 1;
   const canGoBack = idx > 0;
 
@@ -79,8 +86,8 @@ export function ChatbotPanel() {
       return;
     }
     const items: ChatbotQAItem[] = state.questions.map((q, i) => ({
-      source: i === 0 ? 'common' : 'dynamic',
-      question: q,
+      category: q.category,
+      question: q.question,
       answer: newAnswers[i],
     }));
     dispatch({ type: 'SUBMIT_QA', payload: items });
@@ -101,11 +108,14 @@ export function ChatbotPanel() {
         <p className="font-numeric text-sm tracking-[0.3em] text-(--color-magenta)">
           {String(idx + 1).padStart(2, '0')} / {String(state.questions.length).padStart(2, '0')}
         </p>
+        <span className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-3 py-0.5 text-xs font-bold uppercase tracking-[0.18em] text-(--color-ink)">
+          {CATEGORY_LABEL[current.category]}
+        </span>
       </div>
 
       {/* keyed on idx so the bubble re-mounts and the entrance animation re-plays */}
       <SpeechBubble key={idx} tail="top">
-        <span className="font-display text-xl leading-relaxed">{currentQ}</span>
+        <span className="font-display text-xl leading-relaxed">{current.question}</span>
       </SpeechBubble>
 
       {/* TA answer bubble — cyan-tinted counter-bubble. Mirrors the chatbot's

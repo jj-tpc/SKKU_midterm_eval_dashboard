@@ -1,13 +1,19 @@
 import { NextResponse } from 'next/server';
-import commonQuestions from '../../../../prompts/common-questions.json';
+import commonQuestionsRaw from '../../../../prompts/common-questions.json';
 import { generateDynamicQuestions } from '@/lib/evaluators/generate-dynamic-questions';
-import type { Submission } from '@/types';
+import type { ScoreCategory, Submission } from '@/types';
 
 export const runtime = 'nodejs';
 
-function pickRandomCommon(): string {
-  const i = Math.floor(Math.random() * commonQuestions.length);
-  return commonQuestions[i];
+const ORDER: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'creativity'];
+
+type CommonPool = Record<ScoreCategory, string[]>;
+const commonQuestions = commonQuestionsRaw as CommonPool;
+
+function pickFallback(category: ScoreCategory): string {
+  const pool = commonQuestions[category] ?? [];
+  if (pool.length === 0) return '이번 작업에서 가장 신경 쓴 부분이 무엇인가요?';
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 export async function POST(req: Request) {
@@ -16,25 +22,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'API key missing' }, { status: 401 });
   }
   const body = (await req.json()) as { submission: Submission };
-  const common = pickRandomCommon();
 
-  let dynamic: string[];
+  let questions: Array<{ category: ScoreCategory; question: string }>;
   try {
-    const { questions } = await generateDynamicQuestions(body.submission, apiKey);
-    dynamic = questions;
+    const out = await generateDynamicQuestions(body.submission, apiKey);
+    // Re-order to canonical category order, in case the LLM swapped them.
+    const map = new Map(out.questions.map((q) => [q.category, q.question]));
+    questions = ORDER.map((c) => ({ category: c, question: map.get(c) ?? pickFallback(c) }));
   } catch (err) {
     console.warn('dynamic question gen failed, falling back to common pool:', err);
-    const used = new Set([common]);
-    dynamic = [];
-    while (dynamic.length < 2) {
-      const q = pickRandomCommon();
-      if (!used.has(q)) { used.add(q); dynamic.push(q); }
-    }
+    questions = ORDER.map((c) => ({ category: c, question: pickFallback(c) }));
   }
 
-  return NextResponse.json({
-    common,
-    dynamic,
-    questions: [common, ...dynamic],
-  });
+  return NextResponse.json({ questions });
 }

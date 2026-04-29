@@ -26,12 +26,11 @@ const sample: EvaluationResult = {
   chatbotQA: { questions: [] },
   scores: {
     promptDesign:  { score: 25, max: 30, reasoning: 'r' },
-    outputQuality: { score: 18, max: 20, reasoning: 'r' },
-    iteration:     { score: 12, max: 20, reasoning: 'r' },
-    presentation:  { score: 13, max: 15, reasoning: 'r' },
-    creativity:    { score: 14, max: 15, reasoning: 'r' },
+    outputQuality: { score: 20, max: 25, reasoning: 'r' },
+    iteration:     { score: 18, max: 25, reasoning: 'r' },
+    creativity:    { score: 16, max: 20, reasoning: 'r' },
   },
-  totalScore: 82,
+  totalScore: 79,
   evaluatedAt: '2026-04-29T00:00:00Z',
   modelUsed: 'gpt-5.4-mini',
 };
