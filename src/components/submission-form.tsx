@@ -54,18 +54,18 @@ export function SubmissionForm() {
 
   return (
     <section data-component="submission-form" className="mx-auto max-w-5xl px-6 py-8 space-y-5">
-      {/* Group banner — broadcast title bar */}
+      {/* Group banner — neutral title bar (magenta reserved for the CTA) */}
       <div className="flex items-center justify-between border-b-2 border-(--color-ink) pb-3">
         <div className="flex items-baseline gap-3">
-          <span className="text-[10px] uppercase tracking-[0.4em] text-(--color-ink-muted)">Now Evaluating</span>
-          <span className="rounded-full border-2 border-(--color-ink) bg-(--color-magenta) px-4 py-1 font-display text-lg text-(--color-paper)">
+          <span className="text-xs uppercase tracking-[0.4em] text-(--color-ink-muted)">평가 중</span>
+          <span className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-4 py-1 font-display text-lg text-(--color-ink)">
             {group ?? '?'}
           </span>
         </div>
         <button
           type="button"
           onClick={() => dispatch({ type: 'START_NEW' })}
-          className="text-xs font-semibold text-(--color-ink-soft) underline underline-offset-2 hover:text-(--color-magenta)"
+          className="text-xs font-semibold text-(--color-ink-soft) underline underline-offset-2 hover:text-(--color-ink)"
         >
           ← 그룹 다시 선택
         </button>
@@ -108,7 +108,7 @@ export function SubmissionForm() {
               <div data-component="prompt-input" className="rounded-xl border-2 border-(--color-ink) bg-(--color-paper-warm) p-3">
                 <div className="flex items-center gap-2">
                   <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full bg-(--color-ink)" />
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-(--color-ink-soft)">
+                  <label className="text-xs font-bold uppercase tracking-[0.2em] text-(--color-ink-soft)">
                     Prompt · 학생이 쓴 프롬프트{required && <span className="ml-1 text-(--color-danger)">*</span>}
                   </label>
                 </div>
@@ -120,10 +120,10 @@ export function SubmissionForm() {
                 />
               </div>
 
-              <div data-component="result-input" className="rounded-xl border-2 border-(--color-ink) bg-(--color-magenta-tint) p-3">
+              <div data-component="result-input" className="rounded-xl border-2 border-(--color-ink) bg-(--color-paper-warm) p-3">
                 <div className="flex items-center gap-2">
-                  <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full bg-(--color-magenta)" />
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-(--color-magenta-deep)">
+                  <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full bg-(--color-cyan)" />
+                  <label className="text-xs font-bold uppercase tracking-[0.2em] text-(--color-ink-soft)">
                     Result · 그 프롬프트의 출력 <span className="ml-1 text-(--color-ink-muted) font-medium normal-case tracking-normal">(선택)</span>
                   </label>
                 </div>
@@ -138,7 +138,7 @@ export function SubmissionForm() {
 
             {!required && (
               <div className="mt-3">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-(--color-ink-muted)">변경 사유 (옵션)</label>
+                <label className="text-xs font-bold uppercase tracking-[0.2em] text-(--color-ink-muted)">변경 사유 (옵션)</label>
                 <input
                   type="text"
                   value={versions[label].changeNote}

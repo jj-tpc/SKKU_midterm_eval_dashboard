@@ -32,11 +32,14 @@ function tierFor(score: number): Tier {
     halo: 'oklch(0.85 0.16 220 / 0.55)',
     shimmer: 'oklch(0.7 0.18 220 / 0.5)',
   };
+  // KEEP GOING — kept warm on purpose. Magenta-tinted halo + magenta shimmer
+  // so the lowest tier still feels like the chatbot is rooting for the group,
+  // not silently mourning the score.
   return {
     label: 'KEEP GOING',
-    text: 'oklch(0.42 0.015 350)',
-    halo: 'oklch(0.92 0.04 350 / 0.55)',
-    shimmer: 'oklch(0.62 0.012 350 / 0.4)',
+    text: 'oklch(0.55 0.20 350)',
+    halo: 'oklch(0.88 0.14 350 / 0.6)',
+    shimmer: 'oklch(0.68 0.22 350 / 0.5)',
   };
 }
 
@@ -89,7 +92,7 @@ export function TotalScore({ target }: Props) {
         }}
       >
         {target == null ? '··' : display}
-        <span className="ml-1 font-numeric text-[0.28em] text-(--color-ink-muted)"> / 100</span>
+        <span className="ml-2 font-numeric text-[0.36em] text-(--color-ink-muted) tabular-nums"> / 100</span>
       </p>
 
       {t && (

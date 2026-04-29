@@ -1,16 +1,26 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useApiKey } from '@/hooks/use-api-key';
+import { useEval } from '@/store/eval-context';
 
 type Props = { open: boolean; onClose: () => void };
 
 export function SettingsModal({ open, onClose }: Props) {
   const { apiKey, setApiKey, clearApiKey } = useApiKey();
+  const { state, dispatch } = useEval();
   const [draft, setDraft] = useState('');
 
   useEffect(() => {
     if (open) setDraft(apiKey);
   }, [open, apiKey]);
+
+  // Escape closes modal
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -24,25 +34,56 @@ export function SettingsModal({ open, onClose }: Props) {
     >
       <div
         data-component="settings-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
         className="w-[480px] max-w-[92vw] rounded-2xl border-2 border-(--color-ink) bg-(--color-paper) p-6 shadow-[10px_10px_0_0_var(--color-magenta)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-display text-2xl text-(--color-ink)">설정</h2>
-        <p className="mt-2 text-sm text-(--color-ink-soft)">
-          OpenAI API Key를 입력하세요. 브라우저(localStorage)에만 저장되고 서버로 전송되지 않습니다.
-        </p>
-        <input
-          type="password"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder="sk-..."
-          autoFocus
-          className="mt-4 w-full rounded-xl border-2 border-(--color-ink) bg-(--color-paper) px-3 py-2 font-mono text-sm outline-none transition-shadow focus:shadow-[3px_3px_0_0_var(--color-magenta)]"
-        />
-        {!valid && draft.length > 0 && (
-          <p className="mt-1 text-xs font-semibold text-(--color-danger)">키가 너무 짧습니다.</p>
-        )}
-        <div className="mt-5 flex items-center justify-between">
+        <h2 id="settings-title" className="font-display text-2xl text-(--color-ink)">설정</h2>
+
+        <div className="mt-5">
+          <label htmlFor="openai-key-input" className="block text-xs font-bold uppercase tracking-[0.2em] text-(--color-ink-soft)">
+            OpenAI API Key
+          </label>
+          <p className="mt-1 text-sm text-(--color-ink-soft)">
+            브라우저(localStorage)에만 저장되고 서버로 전송되지 않습니다.
+          </p>
+          <input
+            id="openai-key-input"
+            type="password"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="sk-..."
+            autoFocus
+            className="mt-3 w-full rounded-xl border-2 border-(--color-ink) bg-(--color-paper) px-3 py-2 font-mono text-sm outline-none transition-shadow focus:shadow-[3px_3px_0_0_var(--color-magenta)]"
+          />
+          {!valid && draft.length > 0 && (
+            <p className="mt-1 text-xs font-semibold text-(--color-danger)">키가 너무 짧습니다.</p>
+          )}
+        </div>
+
+        <div className="mt-5 border-t-2 border-(--color-line) pt-4">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-(--color-ink-soft)">
+            운영 옵션
+          </p>
+          <label className="mt-2 flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={state.forceRefresh}
+              onChange={(e) => dispatch({ type: 'SET_FORCE_REFRESH', payload: e.target.checked })}
+              className="mt-0.5 accent-(--color-magenta) size-4"
+            />
+            <span className="text-sm">
+              <span className="font-semibold text-(--color-ink)">캐시 무시하고 재평가</span>
+              <span className="block text-xs text-(--color-ink-muted) mt-0.5">
+                같은 그룹을 다시 평가할 때 저장된 점수 대신 새로 채점합니다.
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div className="mt-6 flex items-center justify-between">
           <button
             type="button"
             className="text-xs font-semibold text-(--color-danger) underline underline-offset-2 hover:opacity-80"

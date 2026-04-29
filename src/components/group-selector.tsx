@@ -50,7 +50,7 @@ export function GroupSelector() {
       className="relative mx-auto max-w-4xl px-6 py-12 flex flex-col items-center gap-8"
     >
       <Chatbot pose="idle" size="lg" />
-      <SpeechBubble tail="bottom">
+      <SpeechBubble tail="top">
         <span className="font-display text-lg">평가할 그룹을 골라주세요!</span>
       </SpeechBubble>
 

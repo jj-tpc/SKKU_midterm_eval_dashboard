@@ -1,10 +1,8 @@
 'use client';
-import { useEval } from '@/store/eval-context';
 
 type Props = { onOpenSettings: () => void };
 
 export function Header({ onOpenSettings }: Props) {
-  const { state, dispatch } = useEval();
   return (
     <header
       data-component="header"
@@ -21,24 +19,13 @@ export function Header({ onOpenSettings }: Props) {
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-2 rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-3 py-1 text-xs font-semibold text-(--color-ink) cursor-pointer select-none transition-shadow hover:shadow-[3px_3px_0_0_var(--color-magenta)]">
-            <input
-              type="checkbox"
-              checked={state.forceRefresh}
-              onChange={(e) => dispatch({ type: 'SET_FORCE_REFRESH', payload: e.target.checked })}
-              className="accent-(--color-magenta)"
-            />
-            캐시 무시
-          </label>
-          <button
-            type="button"
-            onClick={onOpenSettings}
-            className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-3 py-1 text-xs font-semibold text-(--color-ink) transition-shadow hover:shadow-[3px_3px_0_0_var(--color-magenta)]"
-          >
-            설정
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onOpenSettings}
+          className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-3 py-1.5 text-xs font-semibold text-(--color-ink) transition-shadow hover:shadow-[3px_3px_0_0_var(--color-magenta)]"
+        >
+          설정
+        </button>
       </div>
     </header>
   );

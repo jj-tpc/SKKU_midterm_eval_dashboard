@@ -72,7 +72,8 @@ body {
   color: var(--color-paper);
 }
 
-/* Subtle paper texture using radial dots — broadcast print feel */
+/* Paper texture — radial dot grid. Light enough to read as "inked paper",
+   strong enough to actually show on a projector. */
 body::before {
   content: "";
   position: fixed;
@@ -80,9 +81,9 @@ body::before {
   pointer-events: none;
   z-index: 0;
   background-image:
-    radial-gradient(circle at 50% 50%, oklch(0.78 0.06 350 / 0.05) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: linear-gradient(to bottom, oklch(0 0 0 / 0.5), oklch(0 0 0 / 0.1));
+    radial-gradient(circle at 50% 50%, oklch(0.62 0.08 350 / 0.12) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse at center, oklch(0 0 0 / 0.5), oklch(0 0 0 / 0.05));
 }
 
 /* ===========================================================

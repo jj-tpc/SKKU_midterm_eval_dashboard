@@ -51,7 +51,7 @@ export function ChatbotPanel() {
     return (
       <section data-component="chatbot-panel" className="mx-auto max-w-3xl px-6 py-12 flex flex-col items-center gap-6">
         <Chatbot pose="thinking" />
-        <SpeechBubble tail="bottom"><span className="font-display">질문 준비 중…</span></SpeechBubble>
+        <SpeechBubble tail="top"><span className="font-display">질문 준비 중…</span></SpeechBubble>
       </section>
     );
   }
@@ -59,7 +59,7 @@ export function ChatbotPanel() {
     return (
       <section data-component="chatbot-panel" className="mx-auto max-w-3xl px-6 py-12 flex flex-col items-center gap-6">
         <Chatbot pose="thinking" />
-        <SpeechBubble tail="bottom">
+        <SpeechBubble tail="top">
           <span className="font-semibold text-(--color-danger)">질문 생성 실패: {errorMsg}</span>
         </SpeechBubble>
       </section>
@@ -95,16 +95,40 @@ export function ChatbotPanel() {
       </div>
 
       {/* keyed on idx so the bubble re-mounts and the entrance animation re-plays */}
-      <SpeechBubble key={idx} tail="bottom">
+      <SpeechBubble key={idx} tail="top">
         <span className="font-display text-xl leading-relaxed">{currentQ}</span>
       </SpeechBubble>
 
-      <textarea
-        value={draftAnswer}
-        onChange={(e) => setDraftAnswer(e.target.value)}
-        className="mt-2 w-full max-w-xl h-36 resize-none rounded-2xl border-2 border-(--color-ink) bg-(--color-paper) p-3 text-sm leading-relaxed outline-none transition-shadow focus:shadow-[3px_3px_0_0_var(--color-magenta)]"
-        placeholder="학생 답변을 받아 적으세요"
-      />
+      {/* TA answer bubble — cyan-tinted counter-bubble. Mirrors the chatbot's
+          shape language so the panel reads as a two-sided conversation. */}
+      <div className="w-full max-w-xl mt-2 rounded-2xl border-2 border-(--color-ink) bg-(--color-cyan-soft) p-3 shadow-[6px_6px_0_0_var(--color-cyan)]">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full bg-(--color-cyan)" />
+            <label htmlFor={`qa-answer-${idx}`} className="text-xs font-bold uppercase tracking-[0.2em] text-(--color-ink-soft)">
+              학생 답변 받아적기
+            </label>
+          </div>
+          <span className="font-numeric text-xs tabular-nums text-(--color-ink-muted)">
+            {draftAnswer.length}자
+          </span>
+        </div>
+        <textarea
+          id={`qa-answer-${idx}`}
+          value={draftAnswer}
+          onChange={(e) => setDraftAnswer(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && draftAnswer.trim()) {
+              e.preventDefault();
+              next();
+            }
+          }}
+          autoFocus
+          className="block w-full h-32 resize-none rounded-xl border-2 border-(--color-ink) bg-(--color-paper) p-3 text-sm leading-relaxed outline-none transition-shadow focus:shadow-[3px_3px_0_0_var(--color-cyan)]"
+          placeholder="학생 답변을 받아 적으세요  (⌘/Ctrl + Enter 로 다음)"
+        />
+      </div>
+
       <button
         type="button"
         disabled={!draftAnswer.trim()}

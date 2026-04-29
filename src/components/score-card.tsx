@@ -65,7 +65,7 @@ export function ScoreCard({ category, score, max, reasoning, status }: Props) {
     >
       <div className="flex items-center justify-between">
         <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: meta.accent }} />
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-(--color-ink-soft)">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-(--color-ink-soft)">
           {meta.label}
         </p>
       </div>
@@ -88,7 +88,7 @@ export function ScoreCard({ category, score, max, reasoning, status }: Props) {
         <p className="mt-3 text-xs leading-relaxed text-(--color-ink-soft) line-clamp-3">{reasoning}</p>
       )}
       {status === 'error' && (
-        <p className="mt-3 text-xs leading-relaxed text-(--color-danger)">평가 실패: {reasoning}</p>
+        <p className="mt-3 text-xs leading-relaxed text-(--color-danger)">채점 일시 오류 — 다시 시도해 주세요.</p>
       )}
     </div>
   );
