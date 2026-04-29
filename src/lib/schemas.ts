@@ -46,3 +46,13 @@ export const dynamicQuestionsResponseSchema = z.object({
 export const cheerMessageResponseSchema = z.object({
   message: z.string().min(1).max(280),
 });
+
+export const requiredElementsResponseSchema = z.object({
+  elements: z.array(
+    z.object({
+      requirement: z.string().min(1),
+      status: z.enum(['covered', 'partial', 'missing']),
+      evidence: z.string().min(1),
+    })
+  ).min(1),
+});

@@ -9,6 +9,7 @@ import { SubmissionForm } from '@/components/submission-form';
 import { ChatbotPanel } from '@/components/chatbot-panel';
 import { ScoreReveal } from '@/components/score-reveal';
 import { GroupSelector } from '@/components/group-selector';
+import { TopicSelector } from '@/components/topic-selector';
 
 export default function Page() {
   const { state, dispatch } = useEval();
@@ -17,7 +18,7 @@ export default function Page() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
-    if (loaded && !apiKey && state.phase === 'input') {
+    if (loaded && !apiKey && (state.phase === 'topic' || state.phase === 'input')) {
       setSettingsOpen(true);
     }
   }, [loaded, apiKey, state.phase]);
@@ -43,6 +44,7 @@ export default function Page() {
       <Header onOpenSettings={() => setSettingsOpen(true)} />
 
       {state.phase === 'idle' && <GroupSelector />}
+      {state.phase === 'topic' && <TopicSelector />}
 
       {state.phase === 'input' && <SubmissionForm />}
       {state.phase === 'qa' && <ChatbotPanel />}

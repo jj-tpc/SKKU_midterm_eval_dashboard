@@ -5,6 +5,7 @@ import { ScoreCard } from './score-card';
 import { TotalScore } from './total-score';
 import { Chatbot } from './chatbot';
 import { SpeechBubble } from './speech-bubble';
+import { RequiredElementsWidget } from './required-elements-widget';
 import { SCORE_MAX, type ScoreCategory } from '@/types';
 
 const ORDER: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'creativity'];
@@ -132,8 +133,8 @@ export function ScoreReveal() {
         <TotalScore target={showTotal ? state.totalScore : null} />
       </div>
 
-      {/* RIGHT — top: score cards, bottom: chatbot + bubble */}
-      <div className="flex flex-col gap-8 min-w-0">
+      {/* RIGHT — top: score cards, mid: required elements check, bottom: chatbot + bubble */}
+      <div className="flex flex-col gap-6 min-w-0">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 items-start">
           {ORDER.map((cat) => {
             const s = state.scores[cat];
@@ -159,6 +160,8 @@ export function ScoreReveal() {
             );
           })}
         </div>
+
+        <RequiredElementsWidget topic={state.topic} result={state.requiredElements} />
 
         <div className="flex items-end gap-4 pt-2">
           <div className="shrink-0">

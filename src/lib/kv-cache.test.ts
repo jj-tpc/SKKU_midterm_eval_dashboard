@@ -22,7 +22,11 @@ beforeEach(() => kvStore.clear());
 
 const sample: EvaluationResult = {
   group: '그룹1',
-  submission: { group: '그룹1', versions: [{ label: 'v1', prompt: 'p', result: 'r' }] },
+  submission: {
+    group: '그룹1',
+    topicId: 'synopsis',
+    versions: [{ label: 'v1', prompt: 'p', result: 'r' }],
+  },
   chatbotQA: { questions: [] },
   scores: {
     promptDesign:  { score: 25, max: 30, reasoning: 'r' },

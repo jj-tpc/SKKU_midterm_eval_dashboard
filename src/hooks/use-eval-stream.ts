@@ -70,6 +70,9 @@ export function useEvalStream() {
           case 'complete':
             dispatch({ type: 'COMPLETE', payload: { totalScore: parsed.totalScore } });
             break;
+          case 'required-elements':
+            dispatch({ type: 'RECEIVE_REQUIRED_ELEMENTS', payload: parsed });
+            break;
           case 'cheer':
             dispatch({ type: 'CHEER', payload: parsed.message });
             break;

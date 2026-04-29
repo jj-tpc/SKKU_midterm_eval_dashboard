@@ -2,11 +2,13 @@ import { evaluatePromptDesign } from '@/lib/evaluators/evaluate-prompt-design';
 import { evaluateOutputQuality } from '@/lib/evaluators/evaluate-output-quality';
 import { evaluateIteration } from '@/lib/evaluators/evaluate-iteration';
 import { evaluateCreativity } from '@/lib/evaluators/evaluate-creativity';
+import { evaluateRequiredElements } from '@/lib/evaluators/evaluate-required-elements';
 import { generateCheerMessage } from '@/lib/evaluators/generate-cheer-message';
 import { getCachedEvaluation, setCachedEvaluation } from '@/lib/kv-cache';
 import { DEFAULT_MODEL } from '@/lib/run-evaluator';
+import { getTopic } from '@/lib/topics';
 import { SCORE_MAX } from '@/types';
-import type { ChatbotQA, ChatbotQAItem, EvaluationResult, Group, ScoreCategory, Submission } from '@/types';
+import type { ChatbotQA, ChatbotQAItem, EvaluationResult, Group, RequiredElementsResult, ScoreCategory, Submission } from '@/types';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -44,7 +46,12 @@ export async function POST(req: Request) {
         controller.enqueue(encoder.encode(sse(event, data)));
 
       try {
-        const cached = body.forceRefresh ? null : await getCachedEvaluation(body.group);
+        // Cache key is just the group, but we validate that the cached
+        // submission is for the SAME topic before serving it. Otherwise
+        // the team picked a different topic and we have to re-evaluate.
+        const rawCached = body.forceRefresh ? null : await getCachedEvaluation(body.group);
+        const sameTopic = rawCached?.submission.topicId === body.submission.topicId;
+        const cached = sameTopic ? rawCached : null;
         send('cache-status', { hit: !!cached });
 
         if (cached) {
@@ -54,6 +61,9 @@ export async function POST(req: Request) {
             await sleep(500);
           }
           send('complete', { totalScore: cached.totalScore, evaluatedAt: cached.evaluatedAt });
+          if (cached.requiredElements) {
+            send('required-elements', cached.requiredElements);
+          }
           if (cached.cheerMessage) {
             send('cheer', { message: cached.cheerMessage });
           }
@@ -61,12 +71,28 @@ export async function POST(req: Request) {
           return;
         }
 
+        const topic = getTopic(body.submission.topicId);
+
         const tasks: Array<{ category: ScoreCategory; promise: Promise<{ score: number; reasoning: string }> }> = [
           { category: 'promptDesign',  promise: evaluatePromptDesign(body.submission,  pickQA(body.chatbotQA, 'promptDesign'),  apiKey) },
           { category: 'outputQuality', promise: evaluateOutputQuality(body.submission, pickQA(body.chatbotQA, 'outputQuality'), apiKey) },
           { category: 'iteration',     promise: evaluateIteration(body.submission,     pickQA(body.chatbotQA, 'iteration'),     apiKey) },
           { category: 'creativity',    promise: evaluateCreativity(body.submission,    pickQA(body.chatbotQA, 'creativity'),    apiKey) },
         ];
+
+        // Run the required-elements check in parallel with the rubric.
+        // It's a separate signal — does not count toward the 100 points.
+        let requiredElements: RequiredElementsResult | undefined;
+        const requiredElementsPromise = topic
+          ? evaluateRequiredElements(body.submission, topic, apiKey)
+              .then((r) => {
+                requiredElements = { topicId: topic.id, elements: r.elements };
+                send('required-elements', requiredElements);
+              })
+              .catch((err) => {
+                console.warn('required-elements check failed:', err);
+              })
+          : Promise.resolve();
 
         const results: Partial<Record<ScoreCategory, { score: number; reasoning: string; ok: boolean }>> = {};
         const wrapped = tasks.map(async ({ category, promise }) => {
@@ -80,7 +106,7 @@ export async function POST(req: Request) {
             send('score', { category, score: 0, max: SCORE_MAX[category], reasoning: msg, status: 'error' });
           }
         });
-        await Promise.all(wrapped);
+        await Promise.all([...wrapped, requiredElementsPromise]);
 
         const allOk = Object.values(results).every((r) => r!.ok);
         const total = ORDER.reduce((sum, c) => sum + (results[c]?.score ?? 0), 0);
@@ -115,6 +141,7 @@ export async function POST(req: Request) {
             submission: body.submission,
             chatbotQA: body.chatbotQA,
             scores: finalScores,
+            requiredElements,
             totalScore: total,
             cheerMessage,
             evaluatedAt,

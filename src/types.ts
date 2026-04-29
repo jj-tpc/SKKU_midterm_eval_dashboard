@@ -1,6 +1,20 @@
 export const GROUPS = ['그룹1', '그룹2', '그룹3', '그룹4', '그룹5'] as const;
 export type Group = (typeof GROUPS)[number];
 
+export type TopicId =
+  | 'synopsis'
+  | 'content-plan'
+  | 'review-framework'
+  | 'portfolio-script'
+  | 'movie-chatbot';
+
+export type Topic = {
+  id: TopicId;
+  title: string;
+  goal: string;
+  requiredElements: string[];
+};
+
 export type VersionLabel = 'v1' | 'v2' | 'v3';
 
 export type PromptVersion = {
@@ -12,6 +26,7 @@ export type PromptVersion = {
 
 export type Submission = {
   group: Group;
+  topicId: TopicId;
   versions: PromptVersion[];
 };
 
@@ -45,11 +60,25 @@ export type CategoryScore = {
   reasoning: string;
 };
 
+export type RequiredElementStatus = 'covered' | 'partial' | 'missing';
+
+export type RequiredElementCheck = {
+  requirement: string;
+  status: RequiredElementStatus;
+  evidence: string;
+};
+
+export type RequiredElementsResult = {
+  topicId: TopicId;
+  elements: RequiredElementCheck[];
+};
+
 export type EvaluationResult = {
   group: Group;
   submission: Submission;
   chatbotQA: ChatbotQA;
   scores: Record<ScoreCategory, CategoryScore>;
+  requiredElements?: RequiredElementsResult;
   totalScore: number;
   cheerMessage?: string;
   evaluatedAt: string;

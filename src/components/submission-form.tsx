@@ -12,6 +12,7 @@ const FIELD_BASE =
 export function SubmissionForm() {
   const { state, dispatch } = useEval();
   const group = state.group;
+  const topic = state.topic;
   const [versions, setVersions] = useState<Record<VersionLabel, DraftVersion>>({
     v1: emptyDraft(),
     v2: emptyDraft(),
@@ -36,10 +37,10 @@ export function SubmissionForm() {
   const hasOrphan = visibleLabels.some(
     (l) => versions[l].prompt.trim() === '' && versions[l].result.trim() !== ''
   );
-  const canSubmit = group !== null && v1HasPrompt && !hasOrphan;
+  const canSubmit = group !== null && topic !== null && v1HasPrompt && !hasOrphan;
 
   function submit() {
-    if (!group) return;
+    if (!group || !topic) return;
     const collected: PromptVersion[] = visibleLabels
       .filter((l) => versions[l].prompt.trim().length > 0)
       .map((l) => ({
@@ -48,27 +49,61 @@ export function SubmissionForm() {
         result: versions[l].result.trim(),
         changeNote: versions[l].changeNote.trim() || undefined,
       }));
-    const sub: Submission = { group, versions: collected };
+    const sub: Submission = { group, topicId: topic.id, versions: collected };
     dispatch({ type: 'SUBMIT_FORM', payload: sub });
   }
 
   return (
     <section data-component="submission-form" className="mx-auto max-w-5xl px-6 py-8 space-y-5">
-      {/* Group banner — neutral title bar (magenta reserved for the CTA) */}
-      <div className="flex items-center justify-between border-b-2 border-(--color-ink) pb-3">
-        <div className="flex items-baseline gap-3">
-          <span className="text-xs uppercase tracking-[0.4em] text-(--color-ink-muted)">평가 중</span>
-          <span className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-4 py-1 font-display text-lg text-(--color-ink)">
-            {group ?? '?'}
-          </span>
+      {/* Group + topic banner */}
+      <div className="border-b-2 border-(--color-ink) pb-3 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-baseline gap-3">
+            <span className="text-xs uppercase tracking-[0.4em] text-(--color-ink-muted)">평가 중</span>
+            <span className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-4 py-1 font-display text-lg text-(--color-ink)">
+              {group ?? '?'}
+            </span>
+            {topic && (
+              <span className="rounded-full border-2 border-(--color-ink) bg-(--color-magenta-tint) px-3 py-1 text-sm font-display text-(--color-ink)">
+                {topic.title}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3 text-xs font-semibold">
+            {topic && (
+              <button
+                type="button"
+                onClick={() => dispatch({ type: 'SELECT_TOPIC', payload: topic })}
+                className="text-(--color-ink-soft) underline underline-offset-2 hover:text-(--color-magenta)"
+              >
+                ← 주제 다시 선택
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => dispatch({ type: 'START_NEW' })}
+              className="text-(--color-ink-soft) underline underline-offset-2 hover:text-(--color-ink)"
+            >
+              ← 그룹 다시 선택
+            </button>
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={() => dispatch({ type: 'START_NEW' })}
-          className="text-xs font-semibold text-(--color-ink-soft) underline underline-offset-2 hover:text-(--color-ink)"
-        >
-          ← 그룹 다시 선택
-        </button>
+        {topic && (
+          <details className="group rounded-xl border border-(--color-line) bg-(--color-paper-warm) px-4 py-2 text-xs">
+            <summary className="cursor-pointer select-none list-none font-bold uppercase tracking-[0.2em] text-(--color-ink-soft) marker:hidden">
+              <span className="inline-block transition-transform group-open:rotate-90 mr-1">▸</span>
+              필수 포함 요소 펼쳐보기
+            </summary>
+            <ul className="mt-2 space-y-1 text-(--color-ink) leading-snug">
+              {topic.requiredElements.map((req, i) => (
+                <li key={i} className="flex gap-2">
+                  <span aria-hidden="true" className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-(--color-magenta)" />
+                  <span>{req}</span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
       </div>
 
       {visibleLabels.map((label, idx) => {
