@@ -75,7 +75,7 @@ export function GroupSelector() {
                 'group relative isolate rounded-2xl border-2 border-(--color-ink) px-4 pt-4 pb-5 text-left transition-transform duration-200 ' +
                 (isSelected
                   ? 'bg-(--color-magenta) text-(--color-paper) -translate-y-1 shadow-[6px_8px_0_0_var(--color-ink)]'
-                  : 'bg-(--color-paper) text-(--color-ink) hover:-translate-y-0.5 hover:shadow-[4px_6px_0_0_var(--color-magenta)]')
+                  : 'bg-(--color-paper) text-(--color-ink) shadow-[3px_4px_0_0_var(--color-line-strong)] hover:-translate-y-0.5 hover:shadow-[4px_6px_0_0_var(--color-magenta)]')
               }
             >
               <span className="block font-numeric text-2xl leading-none">
@@ -86,14 +86,13 @@ export function GroupSelector() {
               </span>
               {hasCache && (
                 <span
-                  aria-hidden="true"
                   title="이미 평가됨"
                   className={
-                    'absolute top-2 right-2 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold tracking-wider ' +
+                    'absolute top-2 right-2 inline-flex items-center gap-1 rounded-full border-2 border-(--color-ink) px-1.5 py-0 text-[10px] font-bold tracking-wider ' +
                     (isSelected ? 'bg-(--color-paper) text-(--color-magenta)' : 'bg-(--color-yellow) text-(--color-ink)')
                   }
                 >
-                  ●
+                  평가됨
                 </span>
               )}
             </button>

@@ -42,41 +42,43 @@ export function Chatbot({ pose = 'idle', size = 'md' }: Props) {
         {/* Soft glow halo */}
         <circle cx="70" cy="78" r="62" fill="url(#cb-glow)" />
 
-        {/* Whole body group (animated) */}
+        {/* Whole body group (animated). Magenta is reserved for the head
+            outline, cheek dots, antenna dot, and glow halo — everything
+            else uses ink so the magenta still reads as a scarcity signal. */}
         <g className="cb-body">
-          {/* Lower body */}
+          {/* Lower body — ink outline */}
           <ellipse
             cx="70" cy="108"
             rx="22" ry="14"
             fill="url(#cb-shell)"
-            stroke="oklch(0.62 0.27 350)" strokeWidth="1.6"
+            stroke="oklch(0.42 0.015 350)" strokeWidth="1.6"
           />
-          {/* Body stripe — magenta band */}
+          {/* Body stripe — ink */}
           <line
             x1="52" y1="108" x2="88" y2="108"
-            stroke="oklch(0.62 0.27 350)" strokeWidth="2.5" strokeLinecap="round"
+            stroke="oklch(0.18 0.022 350)" strokeWidth="2.5" strokeLinecap="round"
           />
 
-          {/* Left arm */}
+          {/* Left arm — ink outline */}
           <g className="cb-arm-left">
             <ellipse
               cx="46" cy="100"
               rx="8.5" ry="7"
               fill="url(#cb-shell)"
-              stroke="oklch(0.62 0.27 350)" strokeWidth="1.5"
+              stroke="oklch(0.42 0.015 350)" strokeWidth="1.5"
             />
           </g>
-          {/* Right arm */}
+          {/* Right arm — ink outline */}
           <g className="cb-arm-right">
             <ellipse
               cx="94" cy="100"
               rx="8.5" ry="7"
               fill="url(#cb-shell)"
-              stroke="oklch(0.62 0.27 350)" strokeWidth="1.5"
+              stroke="oklch(0.42 0.015 350)" strokeWidth="1.5"
             />
           </g>
 
-          {/* Head — dominant sphere */}
+          {/* Head — dominant sphere; only this outline keeps magenta */}
           <circle
             cx="70" cy="62"
             r="38"
@@ -107,8 +109,8 @@ export function Chatbot({ pose = 'idle', size = 'md' }: Props) {
           <circle cx="50" cy="73" r="2.6" fill="oklch(0.78 0.20 350)" opacity="0.7" />
           <circle cx="90" cy="73" r="2.6" fill="oklch(0.78 0.20 350)" opacity="0.7" />
 
-          {/* Antenna — yellow neon dot */}
-          <line x1="70" y1="22" x2="70" y2="26" stroke="oklch(0.62 0.27 350)" strokeWidth="1.8" strokeLinecap="round" />
+          {/* Antenna — ink line, yellow neon dot */}
+          <line x1="70" y1="22" x2="70" y2="26" stroke="oklch(0.42 0.015 350)" strokeWidth="1.8" strokeLinecap="round" />
           <circle cx="70" cy="20" r="2.6" fill="oklch(0.88 0.18 95)" />
           <circle cx="70" cy="20" r="4.5" fill="oklch(0.88 0.18 95)" opacity="0.35" />
         </g>

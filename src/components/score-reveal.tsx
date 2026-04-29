@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useEval } from '@/store/eval-context';
 import { ScoreCard } from './score-card';
 import { TotalScore } from './total-score';
@@ -40,8 +40,10 @@ function Confetti() {
       })),
     []
   );
+  // z-20: below the header (sticky z-30) so 'LIVE SCOREBOARD' typography
+  // never gets occluded by falling pieces.
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-20 overflow-hidden">
       {particles.map((p) => (
         <span
           key={p.id}
@@ -69,7 +71,19 @@ export function ScoreReveal() {
   const arrivedScores = ORDER.map((c) => state.scores[c]).filter(Boolean);
   const allArrived = arrivedScores.length === ORDER.length;
   const allErrored = allArrived && arrivedScores.every((s) => s!.status === 'error');
-  const showTotal = state.totalScore != null && allArrived && !allErrored;
+  const totalReady = state.totalScore != null && allArrived && !allErrored;
+
+  // Stage-spotlight rule: hold the total halo back until the last card
+  // entrance has settled (~600ms after the 5th score arrives). Cards take
+  // the spotlight first, the total takes it second.
+  const [spotlightOnTotal, setSpotlightOnTotal] = useState(false);
+  useEffect(() => {
+    if (!totalReady) { setSpotlightOnTotal(false); return; }
+    const t = setTimeout(() => setSpotlightOnTotal(true), 700);
+    return () => clearTimeout(t);
+  }, [totalReady]);
+
+  const showTotal = totalReady && spotlightOnTotal;
   const totalForBubble = state.totalScore ?? 0;
   const bubbleMessage = state.cheerMessage ?? (showTotal ? fallbackMessage(totalForBubble) : null);
   const isChampion = showTotal && totalForBubble >= 90;

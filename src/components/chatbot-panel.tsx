@@ -68,6 +68,7 @@ export function ChatbotPanel() {
 
   const currentQ = state.questions[idx];
   const isLast = idx === state.questions.length - 1;
+  const canGoBack = idx > 0;
 
   function next() {
     const newAnswers = [...answers, draftAnswer.trim()];
@@ -83,6 +84,14 @@ export function ChatbotPanel() {
       answer: newAnswers[i],
     }));
     dispatch({ type: 'SUBMIT_QA', payload: items });
+  }
+
+  function back() {
+    if (!canGoBack) return;
+    const previous = answers[idx - 1] ?? '';
+    setAnswers(answers.slice(0, idx - 1));
+    setDraftAnswer(previous);
+    setIdx(idx - 1);
   }
 
   return (
@@ -129,14 +138,25 @@ export function ChatbotPanel() {
         />
       </div>
 
-      <button
-        type="button"
-        disabled={!draftAnswer.trim()}
-        onClick={next}
-        className="rounded-full border-2 border-(--color-ink) bg-(--color-magenta) px-7 py-3 font-display text-lg text-(--color-paper) tracking-wide shadow-[6px_6px_0_0_var(--color-ink)] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:shadow-[3px_3px_0_0_var(--color-ink)] disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-[3px_3px_0_0_var(--color-line-strong)]"
-      >
-        {isLast ? '채점 시작' : '다음 질문 →'}
-      </button>
+      <div className="flex items-center gap-3">
+        {canGoBack && (
+          <button
+            type="button"
+            onClick={back}
+            className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-5 py-2.5 font-display text-base text-(--color-ink) tracking-wide shadow-[4px_4px_0_0_var(--color-line-strong)] transition-transform hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_var(--color-ink)] active:translate-y-0 active:shadow-[2px_2px_0_0_var(--color-ink)]"
+          >
+            ← 이전
+          </button>
+        )}
+        <button
+          type="button"
+          disabled={!draftAnswer.trim()}
+          onClick={next}
+          className="rounded-full border-2 border-(--color-ink) bg-(--color-magenta) px-7 py-3 font-display text-lg text-(--color-paper) tracking-wide shadow-[6px_6px_0_0_var(--color-ink)] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:shadow-[3px_3px_0_0_var(--color-ink)] disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-[3px_3px_0_0_var(--color-line-strong)]"
+        >
+          {isLast ? '채점 시작' : '다음 질문 →'}
+        </button>
+      </div>
     </section>
   );
 }
