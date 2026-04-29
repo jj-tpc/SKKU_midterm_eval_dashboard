@@ -8,32 +8,37 @@ export function Header({ onOpenSettings }: Props) {
   return (
     <header
       data-component="header"
-      className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-sky-100 bg-white/80 backdrop-blur px-6 py-3"
+      className="sticky top-0 z-30 border-b-2 border-(--color-ink) bg-(--color-paper)"
     >
-      <div className="flex items-center gap-2">
-        <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full bg-sky-500 ring-2 ring-sky-200" />
-        <h1 className="text-base font-bold tracking-tight text-slate-800">
-          SKKU 프롬프트 평가 대시보드
-        </h1>
-      </div>
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3">
+        <div className="flex items-baseline gap-3">
+          <span aria-hidden="true" className="inline-block h-3 w-3 rounded-full bg-(--color-magenta)" />
+          <h1 className="font-display text-xl tracking-tight text-(--color-ink)">
+            SKKU 프롬프트 평가
+          </h1>
+          <span className="hidden sm:inline text-xs uppercase tracking-[0.25em] text-(--color-ink-muted)">
+            Live Scoreboard
+          </span>
+        </div>
 
-      <div className="flex items-center gap-3">
-        <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600 cursor-pointer select-none hover:border-sky-300 transition-colors">
-          <input
-            type="checkbox"
-            checked={state.forceRefresh}
-            onChange={(e) => dispatch({ type: 'SET_FORCE_REFRESH', payload: e.target.checked })}
-            className="accent-sky-500"
-          />
-          캐시 무시
-        </label>
-        <button
-          type="button"
-          onClick={onOpenSettings}
-          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:border-sky-300 hover:text-sky-600 transition-colors"
-        >
-          설정
-        </button>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-2 rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-3 py-1 text-xs font-semibold text-(--color-ink) cursor-pointer select-none transition-shadow hover:shadow-[3px_3px_0_0_var(--color-magenta)]">
+            <input
+              type="checkbox"
+              checked={state.forceRefresh}
+              onChange={(e) => dispatch({ type: 'SET_FORCE_REFRESH', payload: e.target.checked })}
+              className="accent-(--color-magenta)"
+            />
+            캐시 무시
+          </label>
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-3 py-1 text-xs font-semibold text-(--color-ink) transition-shadow hover:shadow-[3px_3px_0_0_var(--color-magenta)]"
+          >
+            설정
+          </button>
+        </div>
       </div>
     </header>
   );

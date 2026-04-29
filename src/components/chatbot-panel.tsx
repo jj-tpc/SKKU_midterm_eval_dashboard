@@ -49,18 +49,18 @@ export function ChatbotPanel() {
 
   if (loading) {
     return (
-      <section data-component="chatbot-panel" className="p-8 flex flex-col items-center gap-6">
+      <section data-component="chatbot-panel" className="mx-auto max-w-3xl px-6 py-12 flex flex-col items-center gap-6">
         <Chatbot pose="thinking" />
-        <SpeechBubble>질문을 준비하는 중…</SpeechBubble>
+        <SpeechBubble tail="bottom"><span className="font-display">질문 준비 중…</span></SpeechBubble>
       </section>
     );
   }
   if (errorMsg) {
     return (
-      <section data-component="chatbot-panel" className="p-8 flex flex-col items-center gap-6">
+      <section data-component="chatbot-panel" className="mx-auto max-w-3xl px-6 py-12 flex flex-col items-center gap-6">
         <Chatbot pose="thinking" />
-        <SpeechBubble>
-          <span className="text-red-600">질문 생성 실패: {errorMsg}</span>
+        <SpeechBubble tail="bottom">
+          <span className="font-semibold text-(--color-danger)">질문 생성 실패: {errorMsg}</span>
         </SpeechBubble>
       </section>
     );
@@ -86,30 +86,30 @@ export function ChatbotPanel() {
   }
 
   return (
-    <section data-component="chatbot-panel" className="p-8 flex flex-col items-center gap-6">
+    <section data-component="chatbot-panel" className="mx-auto max-w-3xl px-6 py-10 flex flex-col items-center gap-6">
       <div className="flex flex-col items-center gap-3">
         <Chatbot pose="talking" />
-        <p className="text-xs uppercase tracking-wider text-sky-600">
-          질문 {idx + 1} / {state.questions.length}
+        <p className="font-numeric text-sm tracking-[0.3em] text-(--color-magenta)">
+          {String(idx + 1).padStart(2, '0')} / {String(state.questions.length).padStart(2, '0')}
         </p>
       </div>
 
-      {/* keyed on idx so the bubble re-mounts and the entrance animation re-plays each question */}
-      <SpeechBubble key={idx}>
-        <span className="text-lg font-semibold leading-relaxed">{currentQ}</span>
+      {/* keyed on idx so the bubble re-mounts and the entrance animation re-plays */}
+      <SpeechBubble key={idx} tail="bottom">
+        <span className="font-display text-xl leading-relaxed">{currentQ}</span>
       </SpeechBubble>
 
       <textarea
         value={draftAnswer}
         onChange={(e) => setDraftAnswer(e.target.value)}
-        className="border border-slate-300 focus:border-sky-400 focus:ring-2 focus:ring-sky-200 outline-none rounded-xl p-3 w-full max-w-xl h-32 text-sm resize-none"
+        className="mt-2 w-full max-w-xl h-36 resize-none rounded-2xl border-2 border-(--color-ink) bg-(--color-paper) p-3 text-sm leading-relaxed outline-none transition-shadow focus:shadow-[3px_3px_0_0_var(--color-magenta)]"
         placeholder="학생 답변을 받아 적으세요"
       />
       <button
         type="button"
         disabled={!draftAnswer.trim()}
         onClick={next}
-        className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-full font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow"
+        className="rounded-full border-2 border-(--color-ink) bg-(--color-magenta) px-7 py-3 font-display text-lg text-(--color-paper) tracking-wide shadow-[6px_6px_0_0_var(--color-ink)] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:shadow-[3px_3px_0_0_var(--color-ink)] disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-[3px_3px_0_0_var(--color-line-strong)]"
       >
         {isLast ? '채점 시작' : '다음 질문 →'}
       </button>

@@ -24,18 +24,18 @@ export function Chatbot({ pose = 'idle', size = 'md' }: Props) {
       >
         <defs>
           <radialGradient id="cb-glow" cx="50%" cy="55%" r="55%">
-            <stop offset="0%"   stopColor="#bae6fd" stopOpacity="0.7" />
-            <stop offset="60%"  stopColor="#bae6fd" stopOpacity="0.18" />
-            <stop offset="100%" stopColor="#bae6fd" stopOpacity="0" />
+            <stop offset="0%"   stopColor="oklch(0.78 0.22 350)" stopOpacity="0.35" />
+            <stop offset="60%"  stopColor="oklch(0.85 0.14 350)" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="oklch(0.93 0.06 350)" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="cb-shell" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#ffffff" />
-            <stop offset="55%"  stopColor="#f0f9ff" />
-            <stop offset="100%" stopColor="#dbeafe" />
+            <stop offset="0%"   stopColor="oklch(1 0 0)" />
+            <stop offset="55%"  stopColor="oklch(0.985 0.012 350)" />
+            <stop offset="100%" stopColor="oklch(0.93 0.05 350)" />
           </linearGradient>
           <radialGradient id="cb-highlight" cx="35%" cy="30%" r="40%">
-            <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="0%"   stopColor="oklch(1 0 0)" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="oklch(1 0 0)" stopOpacity="0" />
           </radialGradient>
         </defs>
 
@@ -44,17 +44,17 @@ export function Chatbot({ pose = 'idle', size = 'md' }: Props) {
 
         {/* Whole body group (animated) */}
         <g className="cb-body">
-          {/* Lower body (small base, mostly behind head) */}
+          {/* Lower body */}
           <ellipse
             cx="70" cy="108"
             rx="22" ry="14"
             fill="url(#cb-shell)"
-            stroke="#7dd3fc" strokeWidth="1.6"
+            stroke="oklch(0.62 0.27 350)" strokeWidth="1.6"
           />
-          {/* Body stripe */}
+          {/* Body stripe — magenta band */}
           <line
             x1="52" y1="108" x2="88" y2="108"
-            stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round"
+            stroke="oklch(0.62 0.27 350)" strokeWidth="2.5" strokeLinecap="round"
           />
 
           {/* Left arm */}
@@ -63,7 +63,7 @@ export function Chatbot({ pose = 'idle', size = 'md' }: Props) {
               cx="46" cy="100"
               rx="8.5" ry="7"
               fill="url(#cb-shell)"
-              stroke="#7dd3fc" strokeWidth="1.5"
+              stroke="oklch(0.62 0.27 350)" strokeWidth="1.5"
             />
           </g>
           {/* Right arm */}
@@ -72,7 +72,7 @@ export function Chatbot({ pose = 'idle', size = 'md' }: Props) {
               cx="94" cy="100"
               rx="8.5" ry="7"
               fill="url(#cb-shell)"
-              stroke="#7dd3fc" strokeWidth="1.5"
+              stroke="oklch(0.62 0.27 350)" strokeWidth="1.5"
             />
           </g>
 
@@ -81,7 +81,7 @@ export function Chatbot({ pose = 'idle', size = 'md' }: Props) {
             cx="70" cy="62"
             r="38"
             fill="url(#cb-shell)"
-            stroke="#7dd3fc" strokeWidth="1.8"
+            stroke="oklch(0.62 0.27 350)" strokeWidth="1.8"
           />
 
           {/* Glossy highlight on head */}
@@ -95,21 +95,22 @@ export function Chatbot({ pose = 'idle', size = 'md' }: Props) {
           <g className="cb-eyes">
             <path
               d="M 56 66 Q 60 60 64 66"
-              stroke="#0f172a" strokeWidth="3" strokeLinecap="round" fill="none"
+              stroke="oklch(0.18 0.02 350)" strokeWidth="3" strokeLinecap="round" fill="none"
             />
             <path
               d="M 76 66 Q 80 60 84 66"
-              stroke="#0f172a" strokeWidth="3" strokeLinecap="round" fill="none"
+              stroke="oklch(0.18 0.02 350)" strokeWidth="3" strokeLinecap="round" fill="none"
             />
           </g>
 
-          {/* Tiny rosy cheeks */}
-          <circle cx="50" cy="73" r="2.4" fill="#fda4af" opacity="0.55" />
-          <circle cx="90" cy="73" r="2.4" fill="#fda4af" opacity="0.55" />
+          {/* Cheeks — magenta */}
+          <circle cx="50" cy="73" r="2.6" fill="oklch(0.78 0.20 350)" opacity="0.7" />
+          <circle cx="90" cy="73" r="2.6" fill="oklch(0.78 0.20 350)" opacity="0.7" />
 
-          {/* Antenna */}
-          <line x1="70" y1="22" x2="70" y2="26" stroke="#7dd3fc" strokeWidth="1.8" strokeLinecap="round" />
-          <circle cx="70" cy="20" r="2.6" fill="#38bdf8" />
+          {/* Antenna — yellow neon dot */}
+          <line x1="70" y1="22" x2="70" y2="26" stroke="oklch(0.62 0.27 350)" strokeWidth="1.8" strokeLinecap="round" />
+          <circle cx="70" cy="20" r="2.6" fill="oklch(0.88 0.18 95)" />
+          <circle cx="70" cy="20" r="4.5" fill="oklch(0.88 0.18 95)" opacity="0.35" />
         </g>
       </svg>
     </div>

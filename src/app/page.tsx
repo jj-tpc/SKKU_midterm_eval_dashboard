@@ -39,7 +39,7 @@ export default function Page() {
   }, [state.phase, state.submission, state.chatbotQA, state.forceRefresh, apiKey, start, dispatch]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-white">
+    <main className="relative min-h-screen bg-(--color-paper)">
       <Header onOpenSettings={() => setSettingsOpen(true)} />
 
       {state.phase === 'idle' && <GroupSelector />}
@@ -49,7 +49,10 @@ export default function Page() {
       {(state.phase === 'grading' || state.phase === 'reveal' || state.phase === 'done') && <ScoreReveal />}
 
       {state.errorMessage && (
-        <div role="alert" className="p-4 bg-red-100 text-red-800 fixed bottom-4 right-4 rounded shadow">
+        <div
+          role="alert"
+          className="fixed bottom-4 right-4 rounded-2xl border-2 border-(--color-ink) bg-(--color-paper) px-4 py-3 text-sm font-semibold text-(--color-danger) shadow-[6px_6px_0_0_var(--color-danger)]"
+        >
           {state.errorMessage}
         </div>
       )}

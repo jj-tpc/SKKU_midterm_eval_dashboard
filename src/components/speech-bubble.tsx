@@ -13,17 +13,22 @@ export function SpeechBubble({ children, tail = 'bottom', className = '' }: Prop
     <div
       data-component="speech-bubble"
       data-tail={tail}
-      className={`relative max-w-xl rounded-2xl border border-sky-200 bg-white px-5 py-4 text-base text-slate-800 shadow-[0_4px_18px_-6px_rgba(56,189,248,0.45)] ${className}`}
+      className={
+        'relative max-w-xl rounded-2xl border-2 border-(--color-ink) bg-(--color-paper) px-5 py-4 ' +
+        'text-base text-(--color-ink) ' +
+        'shadow-[6px_6px_0_0_var(--color-magenta)] ' +
+        className
+      }
     >
       {children}
       <span
         aria-hidden="true"
         className={
           tail === 'bottom'
-            ? 'absolute -bottom-2 left-10 h-4 w-4 rotate-45 border-b border-r border-sky-200 bg-white'
+            ? 'absolute -bottom-[7px] left-10 h-3.5 w-3.5 rotate-45 border-b-2 border-r-2 border-(--color-ink) bg-(--color-paper)'
             : tail === 'left'
-              ? 'absolute -left-2 top-1/2 -translate-y-1/2 h-4 w-4 rotate-45 border-b border-l border-sky-200 bg-white'
-              : 'absolute -right-2 top-1/2 -translate-y-1/2 h-4 w-4 rotate-45 border-t border-r border-sky-200 bg-white'
+              ? 'absolute -left-[7px] top-1/2 -translate-y-1/2 h-3.5 w-3.5 rotate-45 border-b-2 border-l-2 border-(--color-ink) bg-(--color-paper)'
+              : 'absolute -right-[7px] top-1/2 -translate-y-1/2 h-3.5 w-3.5 rotate-45 border-t-2 border-r-2 border-(--color-ink) bg-(--color-paper)'
         }
       />
     </div>

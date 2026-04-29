@@ -1,16 +1,20 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Black_Han_Sans, Bowlby_One } from 'next/font/google';
 import './globals.css';
 import { EvalProvider } from '@/store/eval-context';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const blackHanSans = Black_Han_Sans({
+  weight: '400',
   subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const bowlbyOne = Bowlby_One({
+  weight: '400',
   subsets: ['latin'],
+  variable: '--font-numeric',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -26,8 +30,15 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${blackHanSans.variable} ${bowlbyOne.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+        />
+      </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <EvalProvider>{children}</EvalProvider>
       </body>

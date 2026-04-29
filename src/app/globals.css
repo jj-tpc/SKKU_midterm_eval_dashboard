@@ -1,25 +1,93 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ===========================================================
+   THEME TOKENS — broadcast scoreboard / magenta neon / paper
+   =========================================================== */
+@theme {
+  /* Surface — warm paper white tinted toward magenta */
+  --color-paper: oklch(0.985 0.008 350);
+  --color-paper-warm: oklch(0.97 0.012 350);
+  --color-paper-deep: oklch(0.94 0.018 350);
+
+  /* Ink — near black with magenta whisper, never #000 */
+  --color-ink: oklch(0.18 0.022 350);
+  --color-ink-soft: oklch(0.42 0.015 350);
+  --color-ink-muted: oklch(0.62 0.012 350);
+
+  /* Lines */
+  --color-line: oklch(0.92 0.012 350);
+  --color-line-strong: oklch(0.85 0.018 350);
+
+  /* Brand — magenta neon family */
+  --color-magenta: oklch(0.62 0.27 350);
+  --color-magenta-bright: oklch(0.7 0.29 350);
+  --color-magenta-deep: oklch(0.5 0.25 350);
+  --color-magenta-soft: oklch(0.93 0.06 350);
+  --color-magenta-tint: oklch(0.97 0.025 350);
+
+  /* Supporting neons */
+  --color-cyan: oklch(0.78 0.16 220);
+  --color-cyan-soft: oklch(0.95 0.04 220);
+  --color-yellow: oklch(0.88 0.18 95);
+  --color-yellow-bright: oklch(0.9 0.20 92);
+  --color-yellow-soft: oklch(0.97 0.06 95);
+  --color-violet: oklch(0.65 0.24 305);
+  --color-violet-soft: oklch(0.95 0.05 305);
+  --color-pink: oklch(0.78 0.20 5);
+  --color-pink-soft: oklch(0.96 0.05 5);
+
+  /* Status */
+  --color-danger: oklch(0.62 0.24 25);
+  --color-success: oklch(0.65 0.18 145);
+
+  /* Semantic mappings */
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-ink);
+
+  /* Fonts — display (Korean caps), numeric (English/digits scoreboard), body (Pretendard) */
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --font-display:
+    "Black Han Sans", "Bowlby One", "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --font-numeric:
+    "Bowlby One", "Black Han Sans", "Pretendard Variable", system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* ===========================================================
+   BASE
+   =========================================================== */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "tnum";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* ===== Chatbot animations ===== */
+/* Selection — neon magenta */
+::selection {
+  background: var(--color-magenta);
+  color: var(--color-paper);
+}
 
+/* Subtle paper texture using radial dots — broadcast print feel */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle at 50% 50%, oklch(0.78 0.06 350 / 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to bottom, oklch(0 0 0 / 0.5), oklch(0 0 0 / 0.1));
+}
+
+/* ===========================================================
+   CHATBOT POSE ANIMATIONS
+   =========================================================== */
 @keyframes chatbot-float {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-6px); }
@@ -94,8 +162,9 @@ body {
   animation: chatbot-bounce-big 0.45s ease-in-out infinite;
 }
 
-/* ===== Speech bubble entrance ===== */
-
+/* ===========================================================
+   SPEECH BUBBLE — broadcast caption pop
+   =========================================================== */
 @keyframes bubble-pop {
   0%   { transform: scale(0.85) translateY(4px); opacity: 0; }
   60%  { transform: scale(1.03) translateY(0);   opacity: 1; }
@@ -107,14 +176,64 @@ body {
   transform-origin: bottom left;
 }
 
-/* ===== Score card entrance ===== */
-
+/* ===========================================================
+   SCORE CARD — neon staged entrance
+   =========================================================== */
 @keyframes card-pop {
-  0%   { transform: scale(0.9) translateY(8px); opacity: 0; }
-  100% { transform: scale(1)   translateY(0);   opacity: 1; }
+  0%   { transform: scale(0.9) translateY(10px); opacity: 0; }
+  100% { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+@keyframes card-flash {
+  0%   { box-shadow: 0 0 0 0 var(--card-glow, oklch(0.62 0.27 350 / 0.55)); }
+  100% { box-shadow: 0 0 0 24px oklch(0.62 0.27 350 / 0); }
 }
 
 [data-component="score-card"][data-status="success"],
 [data-component="score-card"][data-status="error"] {
-  animation: card-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation:
+    card-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    card-flash 0.9s ease-out 0.55s both;
+}
+
+/* ===========================================================
+   TOTAL SCORE HALO — magenta neon flash
+   =========================================================== */
+@keyframes total-halo {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0.6); }
+  60%  { opacity: 0.9; transform: translate(-50%, -50%) scale(1.15); }
+  100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes total-shimmer {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50%      { filter: drop-shadow(0 0 24px var(--shimmer-color, oklch(0.62 0.27 350 / 0.6))); }
+}
+
+[data-component="total-score"][data-revealed="true"] .total-halo {
+  animation: total-halo 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+[data-component="total-score"][data-revealed="true"] .total-number {
+  animation: total-shimmer 2.6s ease-in-out infinite;
+}
+
+/* ===========================================================
+   GROUP BUTTON — selected pulse
+   =========================================================== */
+@keyframes group-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--color-magenta); }
+  50%      { box-shadow: 0 0 0 8px oklch(0.62 0.27 350 / 0); }
+}
+
+[data-component="group-button"][data-selected="true"] {
+  animation: group-pulse 1.6s ease-out infinite;
+}
+
+/* ===========================================================
+   CONFETTI on 90+ cheer
+   =========================================================== */
+@keyframes confetti-fall {
+  0%   { transform: translate3d(0, -10vh, 0) rotate(0deg);   opacity: 1; }
+  100% { transform: translate3d(var(--cx, 0), 110vh, 0) rotate(720deg); opacity: 0; }
 }
