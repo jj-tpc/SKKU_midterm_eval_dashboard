@@ -53,21 +53,8 @@ export function TopicSelector() {
                   </h3>
                 </div>
                 <p className="mt-3 text-sm leading-relaxed text-(--color-ink-soft)">
-                  <span className="font-bold text-(--color-ink)">목표 · </span>{t.goal}
+                  {t.goal}
                 </p>
-                <div className="mt-3 rounded-xl border border-(--color-line) bg-(--color-paper-warm) p-3">
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-(--color-ink-soft)">
-                    필수 포함 요소
-                  </p>
-                  <ul className="mt-2 space-y-1.5">
-                    {t.requiredElements.map((req, idx) => (
-                      <li key={idx} className="flex gap-2 text-xs leading-snug text-(--color-ink)">
-                        <span aria-hidden="true" className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-(--color-magenta)" />
-                        <span className="break-words">{req}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </button>
             </li>
           );
