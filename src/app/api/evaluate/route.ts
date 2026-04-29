@@ -3,6 +3,7 @@ import { evaluateOutputQuality } from '@/lib/evaluators/evaluate-output-quality'
 import { evaluateIteration } from '@/lib/evaluators/evaluate-iteration';
 import { evaluatePresentation } from '@/lib/evaluators/evaluate-presentation';
 import { evaluateCreativity } from '@/lib/evaluators/evaluate-creativity';
+import { generateCheerMessage } from '@/lib/evaluators/generate-cheer-message';
 import { getCachedEvaluation, setCachedEvaluation } from '@/lib/kv-cache';
 import { DEFAULT_MODEL } from '@/lib/run-evaluator';
 import { SCORE_MAX } from '@/types';
@@ -49,6 +50,9 @@ export async function POST(req: Request) {
             await sleep(500);
           }
           send('complete', { totalScore: cached.totalScore, evaluatedAt: cached.evaluatedAt });
+          if (cached.cheerMessage) {
+            send('cheer', { message: cached.cheerMessage });
+          }
           controller.close();
           return;
         }
@@ -82,19 +86,36 @@ export async function POST(req: Request) {
 
         send('complete', { totalScore: total, evaluatedAt });
 
+        const finalScores = {
+          promptDesign:  { score: results.promptDesign!.score,  max: SCORE_MAX.promptDesign,  reasoning: results.promptDesign!.reasoning },
+          outputQuality: { score: results.outputQuality!.score, max: SCORE_MAX.outputQuality, reasoning: results.outputQuality!.reasoning },
+          iteration:     { score: results.iteration!.score,     max: SCORE_MAX.iteration,     reasoning: results.iteration!.reasoning },
+          presentation:  { score: results.presentation!.score,  max: SCORE_MAX.presentation,  reasoning: results.presentation!.reasoning },
+          creativity:    { score: results.creativity!.score,    max: SCORE_MAX.creativity,    reasoning: results.creativity!.reasoning },
+        };
+
+        let cheerMessage: string | undefined;
+        try {
+          const cheer = await generateCheerMessage({
+            studentName: body.studentName,
+            totalScore: total,
+            scores: finalScores,
+            apiKey,
+          });
+          cheerMessage = cheer.message;
+          send('cheer', { message: cheer.message });
+        } catch (err) {
+          console.warn('cheer message generation failed:', err);
+        }
+
         if (allOk) {
           const evalResult: EvaluationResult = {
             studentName: body.studentName,
             submission: body.submission,
             chatbotQA: body.chatbotQA,
-            scores: {
-              promptDesign:  { score: results.promptDesign!.score,  max: SCORE_MAX.promptDesign,  reasoning: results.promptDesign!.reasoning },
-              outputQuality: { score: results.outputQuality!.score, max: SCORE_MAX.outputQuality, reasoning: results.outputQuality!.reasoning },
-              iteration:     { score: results.iteration!.score,     max: SCORE_MAX.iteration,     reasoning: results.iteration!.reasoning },
-              presentation:  { score: results.presentation!.score,  max: SCORE_MAX.presentation,  reasoning: results.presentation!.reasoning },
-              creativity:    { score: results.creativity!.score,    max: SCORE_MAX.creativity,    reasoning: results.creativity!.reasoning },
-            },
+            scores: finalScores,
             totalScore: total,
+            cheerMessage,
             evaluatedAt,
             modelUsed: DEFAULT_MODEL,
           };

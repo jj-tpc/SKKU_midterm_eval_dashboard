@@ -12,6 +12,7 @@ export type State = {
   chatbotQA: ChatbotQA;
   scores: Partial<Record<ScoreCategory, StoredScore>>;
   totalScore: number | null;
+  cheerMessage: string | null;
   cacheHit: boolean | null;
   forceRefresh: boolean;
   errorMessage: string | null;
@@ -25,6 +26,7 @@ export const initialState: State = {
   chatbotQA: { questions: [] },
   scores: {},
   totalScore: null,
+  cheerMessage: null,
   cacheHit: null,
   forceRefresh: false,
   errorMessage: null,
@@ -39,6 +41,7 @@ export type Action =
   | { type: 'CACHE_STATUS'; payload: boolean }
   | { type: 'RECEIVE_SCORE'; payload: { category: ScoreCategory; score: number; max: number; reasoning: string; status: 'success' | 'error' } }
   | { type: 'COMPLETE'; payload: { totalScore: number } }
+  | { type: 'CHEER'; payload: string }
   | { type: 'ERROR'; payload: string }
   | { type: 'RESET' };
 
@@ -66,6 +69,8 @@ export function reducer(state: State, action: Action): State {
     }
     case 'COMPLETE':
       return { ...state, totalScore: action.payload.totalScore, phase: 'done' };
+    case 'CHEER':
+      return { ...state, cheerMessage: action.payload };
     case 'ERROR':
       return { ...state, errorMessage: action.payload };
     case 'RESET':

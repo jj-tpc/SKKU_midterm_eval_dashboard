@@ -38,3 +38,7 @@ export const creativityResponseSchema = z.object({
 export const dynamicQuestionsResponseSchema = z.object({
   questions: z.array(z.string().min(1)).length(2),
 });
+
+export const cheerMessageResponseSchema = z.object({
+  message: z.string().min(1).max(280),
+});

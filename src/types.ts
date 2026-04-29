@@ -51,6 +51,7 @@ export type EvaluationResult = {
   chatbotQA: ChatbotQA;
   scores: Record<ScoreCategory, CategoryScore>;
   totalScore: number;
+  cheerMessage?: string;
   evaluatedAt: string;
   modelUsed: string;
 };

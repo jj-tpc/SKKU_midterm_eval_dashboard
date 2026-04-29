@@ -22,7 +22,7 @@ export function SpeechBubble({ children, tail = 'bottom', className = '' }: Prop
           tail === 'bottom'
             ? 'absolute -bottom-2 left-10 h-4 w-4 rotate-45 border-b border-r border-sky-200 bg-white'
             : tail === 'left'
-              ? 'absolute -left-2 top-1/2 -translate-y-1/2 h-4 w-4 rotate-45 border-l border-b border-sky-200 bg-white'
+              ? 'absolute -left-2 top-1/2 -translate-y-1/2 h-4 w-4 rotate-45 border-b border-l border-sky-200 bg-white'
               : 'absolute -right-2 top-1/2 -translate-y-1/2 h-4 w-4 rotate-45 border-t border-r border-sky-200 bg-white'
         }
       />
