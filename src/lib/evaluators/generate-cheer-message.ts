@@ -1,6 +1,6 @@
 import { runEvaluator } from '../run-evaluator';
 import { cheerMessageResponseSchema } from '../schemas';
-import type { CategoryScore, ScoreCategory } from '@/types';
+import type { CategoryScore, Group, ScoreCategory } from '@/types';
 import { SCORE_MAX } from '@/types';
 
 const LABELS: Record<ScoreCategory, string> = {
@@ -12,13 +12,13 @@ const LABELS: Record<ScoreCategory, string> = {
 };
 
 type Args = {
-  studentName: string;
+  group: Group;
   totalScore: number;
   scores: Record<ScoreCategory, CategoryScore>;
   apiKey: string;
 };
 
-export async function generateCheerMessage({ studentName, totalScore, scores, apiKey }: Args) {
+export async function generateCheerMessage({ group, totalScore, scores, apiKey }: Args) {
   const order: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'presentation', 'creativity'];
   const breakdown = order
     .map((c) => `- ${LABELS[c]} (${scores[c].score}/${SCORE_MAX[c]}): ${scores[c].reasoning}`)
@@ -27,7 +27,7 @@ export async function generateCheerMessage({ studentName, totalScore, scores, ap
   return runEvaluator({
     promptName: 'generate-cheer-message',
     vars: {
-      studentName,
+      group,
       totalScore: String(totalScore),
       breakdown,
     },

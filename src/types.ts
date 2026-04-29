@@ -1,3 +1,6 @@
+export const GROUPS = ['그룹1', '그룹2', '그룹3', '그룹4', '그룹5'] as const;
+export type Group = (typeof GROUPS)[number];
+
 export type VersionLabel = 'v1' | 'v2' | 'v3';
 
 export type PromptVersion = {
@@ -8,7 +11,7 @@ export type PromptVersion = {
 };
 
 export type Submission = {
-  studentName: string;
+  group: Group;
   versions: PromptVersion[];
 };
 
@@ -46,7 +49,7 @@ export type CategoryScore = {
 };
 
 export type EvaluationResult = {
-  studentName: string;
+  group: Group;
   submission: Submission;
   chatbotQA: ChatbotQA;
   scores: Record<ScoreCategory, CategoryScore>;

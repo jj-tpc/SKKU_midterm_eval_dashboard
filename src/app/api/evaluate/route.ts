@@ -7,13 +7,13 @@ import { generateCheerMessage } from '@/lib/evaluators/generate-cheer-message';
 import { getCachedEvaluation, setCachedEvaluation } from '@/lib/kv-cache';
 import { DEFAULT_MODEL } from '@/lib/run-evaluator';
 import { SCORE_MAX } from '@/types';
-import type { ChatbotQA, EvaluationResult, ScoreCategory, Submission } from '@/types';
+import type { ChatbotQA, EvaluationResult, Group, ScoreCategory, Submission } from '@/types';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 type Body = {
-  studentName: string;
+  group: Group;
   submission: Submission;
   chatbotQA: ChatbotQA;
   forceRefresh?: boolean;
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         controller.enqueue(encoder.encode(sse(event, data)));
 
       try {
-        const cached = body.forceRefresh ? null : await getCachedEvaluation(body.studentName);
+        const cached = body.forceRefresh ? null : await getCachedEvaluation(body.group);
         send('cache-status', { hit: !!cached });
 
         if (cached) {
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
         let cheerMessage: string | undefined;
         try {
           const cheer = await generateCheerMessage({
-            studentName: body.studentName,
+            group: body.group,
             totalScore: total,
             scores: finalScores,
             apiKey,
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
 
         if (allOk) {
           const evalResult: EvaluationResult = {
-            studentName: body.studentName,
+            group: body.group,
             submission: body.submission,
             chatbotQA: body.chatbotQA,
             scores: finalScores,

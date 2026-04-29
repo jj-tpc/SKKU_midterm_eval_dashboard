@@ -1,4 +1,4 @@
-import type { CategoryScore, ChatbotQA, ChatbotQAItem, ScoreCategory, Submission } from '@/types';
+import type { CategoryScore, ChatbotQA, ChatbotQAItem, Group, ScoreCategory, Submission } from '@/types';
 
 export type Phase = 'idle' | 'input' | 'qa' | 'grading' | 'reveal' | 'done';
 
@@ -6,7 +6,7 @@ export type StoredScore = CategoryScore & { status: 'success' | 'error' };
 
 export type State = {
   phase: Phase;
-  studentName: string;
+  group: Group | null;
   submission: Submission | null;
   questions: string[];
   chatbotQA: ChatbotQA;
@@ -20,7 +20,7 @@ export type State = {
 
 export const initialState: State = {
   phase: 'idle',
-  studentName: '',
+  group: null,
   submission: null,
   questions: [],
   chatbotQA: { questions: [] },
@@ -34,6 +34,7 @@ export const initialState: State = {
 
 export type Action =
   | { type: 'START_NEW' }
+  | { type: 'SELECT_GROUP'; payload: Group }
   | { type: 'SET_FORCE_REFRESH'; payload: boolean }
   | { type: 'SUBMIT_FORM'; payload: Submission }
   | { type: 'SET_QUESTIONS'; payload: string[] }
@@ -48,11 +49,13 @@ export type Action =
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'START_NEW':
-      return { ...initialState, forceRefresh: state.forceRefresh, phase: 'input' };
+      return { ...initialState, forceRefresh: state.forceRefresh, phase: 'idle' };
+    case 'SELECT_GROUP':
+      return { ...initialState, forceRefresh: state.forceRefresh, group: action.payload, phase: 'input' };
     case 'SET_FORCE_REFRESH':
       return { ...state, forceRefresh: action.payload };
     case 'SUBMIT_FORM':
-      return { ...state, submission: action.payload, studentName: action.payload.studentName, phase: 'qa' };
+      return { ...state, submission: action.payload, group: action.payload.group, phase: 'qa' };
     case 'SET_QUESTIONS':
       return { ...state, questions: action.payload };
     case 'SUBMIT_QA':

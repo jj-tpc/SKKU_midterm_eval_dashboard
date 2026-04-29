@@ -10,8 +10,8 @@ const FIELD_BASE =
   'mt-1 w-full rounded-lg border bg-white p-3 text-sm leading-relaxed outline-none transition-colors resize-none';
 
 export function SubmissionForm() {
-  const { dispatch } = useEval();
-  const [name, setName] = useState('');
+  const { state, dispatch } = useEval();
+  const group = state.group;
   const [versions, setVersions] = useState<Record<VersionLabel, DraftVersion>>({
     v1: emptyDraft(),
     v2: emptyDraft(),
@@ -33,13 +33,13 @@ export function SubmissionForm() {
   }
 
   const v1HasPrompt = versions.v1.prompt.trim().length > 0;
-  // Orphan result: result without a prompt makes no sense — only check visible versions.
   const hasOrphan = visibleLabels.some(
     (l) => versions[l].prompt.trim() === '' && versions[l].result.trim() !== ''
   );
-  const canSubmit = name.trim() && v1HasPrompt && !hasOrphan;
+  const canSubmit = group !== null && v1HasPrompt && !hasOrphan;
 
   function submit() {
+    if (!group) return;
     const collected: PromptVersion[] = visibleLabels
       .filter((l) => versions[l].prompt.trim().length > 0)
       .map((l) => ({
@@ -48,21 +48,27 @@ export function SubmissionForm() {
         result: versions[l].result.trim(),
         changeNote: versions[l].changeNote.trim() || undefined,
       }));
-    const sub: Submission = { studentName: name.trim(), versions: collected };
+    const sub: Submission = { group, versions: collected };
     dispatch({ type: 'SUBMIT_FORM', payload: sub });
   }
 
   return (
     <section data-component="submission-form" className="mx-auto max-w-5xl p-6 space-y-6">
-      <div className="rounded-2xl border border-sky-100 bg-white p-5 shadow-sm">
-        <label className="block text-sm font-semibold text-slate-700">학생 이름</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={`${FIELD_BASE} max-w-xs border-slate-200 focus:border-sky-400 focus:ring-2 focus:ring-sky-200`}
-          placeholder="예: 김철수"
-        />
+      {/* Selected group banner */}
+      <div className="flex items-center justify-between rounded-2xl border border-sky-100 bg-white px-5 py-4 shadow-sm">
+        <div className="flex items-center gap-3">
+          <span className="text-xs uppercase tracking-wider text-slate-500">평가 중</span>
+          <span className="rounded-full bg-sky-500 px-3 py-1 text-sm font-semibold text-white">
+            {group ?? '?'}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => dispatch({ type: 'START_NEW' })}
+          className="text-xs text-slate-500 hover:text-sky-600 underline"
+        >
+          ← 그룹 다시 선택
+        </button>
       </div>
 
       {visibleLabels.map((label, idx) => {
@@ -99,11 +105,7 @@ export function SubmissionForm() {
             </div>
 
             <div className="mt-4 grid gap-4 md:grid-cols-2">
-              {/* PROMPT — neutral slate */}
-              <div
-                data-component="prompt-input"
-                className="rounded-xl border border-slate-200 bg-slate-50/80 p-3"
-              >
+              <div data-component="prompt-input" className="rounded-xl border border-slate-200 bg-slate-50/80 p-3">
                 <div className="flex items-center gap-2">
                   <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-slate-500" />
                   <label className="text-xs font-semibold uppercase tracking-wider text-slate-600">
@@ -118,11 +120,7 @@ export function SubmissionForm() {
                 />
               </div>
 
-              {/* RESULT — sky tint to differentiate */}
-              <div
-                data-component="result-input"
-                className="rounded-xl border border-sky-200 bg-sky-50/80 p-3"
-              >
+              <div data-component="result-input" className="rounded-xl border border-sky-200 bg-sky-50/80 p-3">
                 <div className="flex items-center gap-2">
                   <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-sky-500" />
                   <label className="text-xs font-semibold uppercase tracking-wider text-sky-700">

@@ -8,8 +8,7 @@ import { SettingsModal } from '@/components/settings-modal';
 import { SubmissionForm } from '@/components/submission-form';
 import { ChatbotPanel } from '@/components/chatbot-panel';
 import { ScoreReveal } from '@/components/score-reveal';
-import { Chatbot } from '@/components/chatbot';
-import { SpeechBubble } from '@/components/speech-bubble';
+import { GroupSelector } from '@/components/group-selector';
 
 export default function Page() {
   const { state, dispatch } = useEval();
@@ -32,7 +31,7 @@ export default function Page() {
     }
     start({
       apiKey,
-      studentName: state.submission.studentName,
+      group: state.submission.group,
       submission: state.submission,
       chatbotQA: state.chatbotQA,
       forceRefresh: state.forceRefresh,
@@ -43,21 +42,7 @@ export default function Page() {
     <main className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-white">
       <Header onOpenSettings={() => setSettingsOpen(true)} />
 
-      {state.phase === 'idle' && (
-        <div className="p-12 flex flex-col items-center gap-8">
-          <Chatbot pose="idle" size="lg" />
-          <SpeechBubble>
-            <span className="font-semibold">안녕하세요! 평가할 학생을 알려주세요.</span>
-          </SpeechBubble>
-          <button
-            type="button"
-            onClick={() => dispatch({ type: 'START_NEW' })}
-            className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-full text-lg font-semibold shadow-lg shadow-sky-500/30 transition-colors"
-          >
-            다음 학생 평가 시작
-          </button>
-        </div>
-      )}
+      {state.phase === 'idle' && <GroupSelector />}
 
       {state.phase === 'input' && <SubmissionForm />}
       {state.phase === 'qa' && <ChatbotPanel />}
