@@ -17,96 +17,99 @@ export function Chatbot({ pose = 'idle', size = 'md' }: Props) {
       style={{ width: px, height: px }}
     >
       <svg
-        viewBox="0 0 120 130"
+        viewBox="0 0 140 140"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
-        className="block w-full h-full"
+        className="block w-full h-full overflow-visible"
       >
         <defs>
-          <radialGradient id="cb-glow" cx="50%" cy="50%" r="55%">
-            <stop offset="0%"  stopColor="#bae6fd" stopOpacity="0.55" />
-            <stop offset="60%" stopColor="#bae6fd" stopOpacity="0.15" />
+          <radialGradient id="cb-glow" cx="50%" cy="55%" r="55%">
+            <stop offset="0%"   stopColor="#bae6fd" stopOpacity="0.7" />
+            <stop offset="60%"  stopColor="#bae6fd" stopOpacity="0.18" />
             <stop offset="100%" stopColor="#bae6fd" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="cb-shell" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stopColor="#ffffff" />
-            <stop offset="60%"  stopColor="#f0f9ff" />
+            <stop offset="55%"  stopColor="#f0f9ff" />
             <stop offset="100%" stopColor="#dbeafe" />
           </linearGradient>
-          <linearGradient id="cb-band" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stopColor="#7dd3fc" />
-            <stop offset="100%" stopColor="#38bdf8" />
-          </linearGradient>
-          <radialGradient id="cb-highlight" cx="35%" cy="30%" r="35%">
-            <stop offset="0%"  stopColor="#ffffff" stopOpacity="0.95" />
+          <radialGradient id="cb-highlight" cx="35%" cy="30%" r="40%">
+            <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.95" />
             <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
           </radialGradient>
         </defs>
 
         {/* Soft glow halo */}
-        <circle cx="60" cy="65" r="60" fill="url(#cb-glow)" />
+        <circle cx="70" cy="78" r="62" fill="url(#cb-glow)" />
 
-        {/* Whole-body group (animated) */}
+        {/* Whole body group (animated) */}
         <g className="cb-body">
+          {/* Lower body (small base, mostly behind head) */}
+          <ellipse
+            cx="70" cy="108"
+            rx="22" ry="14"
+            fill="url(#cb-shell)"
+            stroke="#7dd3fc" strokeWidth="1.6"
+          />
+          {/* Body stripe */}
+          <line
+            x1="52" y1="108" x2="88" y2="108"
+            stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round"
+          />
+
           {/* Left arm */}
           <g className="cb-arm-left">
             <ellipse
-              cx="22" cy="80" rx="9" ry="7"
+              cx="46" cy="100"
+              rx="8.5" ry="7"
               fill="url(#cb-shell)"
-              stroke="#7dd3fc" strokeWidth="1.4"
+              stroke="#7dd3fc" strokeWidth="1.5"
             />
           </g>
           {/* Right arm */}
           <g className="cb-arm-right">
             <ellipse
-              cx="98" cy="80" rx="9" ry="7"
+              cx="94" cy="100"
+              rx="8.5" ry="7"
               fill="url(#cb-shell)"
-              stroke="#7dd3fc" strokeWidth="1.4"
+              stroke="#7dd3fc" strokeWidth="1.5"
             />
           </g>
 
-          {/* Lower body */}
-          <ellipse
-            cx="60" cy="88" rx="24" ry="17"
-            fill="url(#cb-shell)"
-            stroke="#7dd3fc" strokeWidth="1.5"
-          />
-          {/* Body stripe */}
-          <rect x="40" y="84" width="40" height="3.2" rx="1.6" fill="url(#cb-band)" />
-
-          {/* Head */}
+          {/* Head — dominant sphere */}
           <circle
-            cx="60" cy="50" r="30"
+            cx="70" cy="62"
+            r="38"
             fill="url(#cb-shell)"
-            stroke="#7dd3fc" strokeWidth="1.5"
+            stroke="#7dd3fc" strokeWidth="1.8"
           />
-          {/* Head accent ring (visor-like) */}
-          <ellipse cx="60" cy="38" rx="24" ry="2.6" fill="url(#cb-band)" opacity="0.85" />
 
           {/* Glossy highlight on head */}
-          <circle cx="50" cy="42" r="14" fill="url(#cb-highlight)" />
+          <ellipse
+            cx="58" cy="48"
+            rx="14" ry="9"
+            fill="url(#cb-highlight)"
+          />
 
           {/* Eyes — closed smile arcs */}
           <g className="cb-eyes">
             <path
-              d="M 48 53 Q 52 47 56 53"
-              stroke="#0f172a"
-              strokeWidth="2.6"
-              strokeLinecap="round"
-              fill="none"
+              d="M 56 66 Q 60 60 64 66"
+              stroke="#0f172a" strokeWidth="3" strokeLinecap="round" fill="none"
             />
             <path
-              d="M 64 53 Q 68 47 72 53"
-              stroke="#0f172a"
-              strokeWidth="2.6"
-              strokeLinecap="round"
-              fill="none"
+              d="M 76 66 Q 80 60 84 66"
+              stroke="#0f172a" strokeWidth="3" strokeLinecap="round" fill="none"
             />
           </g>
 
-          {/* Tiny antenna dot */}
-          <circle cx="60" cy="20" r="2.2" fill="#38bdf8" />
-          <line x1="60" y1="22" x2="60" y2="26" stroke="#7dd3fc" strokeWidth="1.6" strokeLinecap="round" />
+          {/* Tiny rosy cheeks */}
+          <circle cx="50" cy="73" r="2.4" fill="#fda4af" opacity="0.55" />
+          <circle cx="90" cy="73" r="2.4" fill="#fda4af" opacity="0.55" />
+
+          {/* Antenna */}
+          <line x1="70" y1="22" x2="70" y2="26" stroke="#7dd3fc" strokeWidth="1.8" strokeLinecap="round" />
+          <circle cx="70" cy="20" r="2.6" fill="#38bdf8" />
         </g>
       </svg>
     </div>
