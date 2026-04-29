@@ -22,14 +22,17 @@ export function SubmissionForm() {
     setVersions((v) => ({ ...v, [label]: { ...v[label], [field]: value } }));
   }
 
-  const v1Filled = versions.v1.prompt.trim() && versions.v1.result.trim();
-  const v2Partial = (versions.v2.prompt.trim() === '') !== (versions.v2.result.trim() === '');
-  const v3Partial = (versions.v3.prompt.trim() === '') !== (versions.v3.result.trim() === '');
-  const canSubmit = name.trim() && v1Filled && !v2Partial && !v3Partial;
+  const v1HasPrompt = versions.v1.prompt.trim().length > 0;
+  // Orphan result: result without a prompt makes no sense — flag it.
+  const v1Orphan = !v1HasPrompt && versions.v1.result.trim().length > 0;
+  const v2Orphan = versions.v2.prompt.trim() === '' && versions.v2.result.trim() !== '';
+  const v3Orphan = versions.v3.prompt.trim() === '' && versions.v3.result.trim() !== '';
+  const hasOrphan = v1Orphan || v2Orphan || v3Orphan;
+  const canSubmit = name.trim() && v1HasPrompt && !hasOrphan;
 
   function submit() {
     const collected: PromptVersion[] = (['v1', 'v2', 'v3'] as VersionLabel[])
-      .filter((l) => versions[l].prompt.trim() && versions[l].result.trim())
+      .filter((l) => versions[l].prompt.trim().length > 0)
       .map((l) => ({
         label: l,
         prompt: versions[l].prompt.trim(),
@@ -67,7 +70,7 @@ export function SubmissionForm() {
                   {label.toUpperCase()}
                 </span>
                 {required ? (
-                  <span className="text-xs font-semibold text-rose-500">필수</span>
+                  <span className="text-xs font-semibold text-rose-500">프롬프트 필수</span>
                 ) : (
                   <span className="text-xs text-slate-400">선택</span>
                 )}
@@ -83,7 +86,7 @@ export function SubmissionForm() {
                 <div className="flex items-center gap-2">
                   <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-slate-500" />
                   <label className="text-xs font-semibold uppercase tracking-wider text-slate-600">
-                    Prompt · 학생이 쓴 프롬프트
+                    Prompt · 학생이 쓴 프롬프트{required && <span className="ml-1 text-rose-500">*</span>}
                   </label>
                 </div>
                 <textarea
@@ -102,7 +105,7 @@ export function SubmissionForm() {
                 <div className="flex items-center gap-2">
                   <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-sky-500" />
                   <label className="text-xs font-semibold uppercase tracking-wider text-sky-700">
-                    Result · 그 프롬프트의 출력
+                    Result · 그 프롬프트의 출력 <span className="ml-1 text-sky-400 normal-case font-normal">(선택)</span>
                   </label>
                 </div>
                 <textarea
@@ -130,9 +133,9 @@ export function SubmissionForm() {
         );
       })}
 
-      {(v2Partial || v3Partial) && (
+      {hasOrphan && (
         <p className="text-sm font-medium text-rose-600">
-          v2/v3는 프롬프트와 결과물을 짝으로 입력하세요.
+          결과물만 입력된 버전이 있어요. 프롬프트도 함께 입력하거나 결과물을 비워두세요.
         </p>
       )}
 
