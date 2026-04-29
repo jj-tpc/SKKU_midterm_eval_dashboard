@@ -1,8 +1,23 @@
 'use client';
+import { useEval } from '@/store/eval-context';
 
 type Props = { onOpenSettings: () => void };
 
 export function Header({ onOpenSettings }: Props) {
+  const { state, dispatch } = useEval();
+  const showBack = state.phase !== 'idle';
+
+  function backToGroup() {
+    if (state.phase === 'idle') return;
+    // Confirm only when mid-flow drafts would be lost. Topic page has no
+    // draft yet, and reveal/done are read-only.
+    const inFlight = state.phase === 'input' || state.phase === 'qa' || state.phase === 'grading';
+    if (inFlight && !confirm('지금까지의 입력이 사라져요. 그룹 선택으로 돌아갈까요?')) {
+      return;
+    }
+    dispatch({ type: 'RESET' });
+  }
+
   return (
     <header
       data-component="header"
@@ -19,13 +34,25 @@ export function Header({ onOpenSettings }: Props) {
           </span>
         </div>
 
-        <button
-          type="button"
-          onClick={onOpenSettings}
-          className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-3 py-1.5 text-xs font-semibold text-(--color-ink) transition-shadow hover:shadow-[3px_3px_0_0_var(--color-magenta)]"
-        >
-          설정
-        </button>
+        <div className="flex items-center gap-2">
+          {showBack && (
+            <button
+              type="button"
+              data-component="header-back-button"
+              onClick={backToGroup}
+              className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-3 py-1.5 text-xs font-semibold text-(--color-ink) transition-shadow hover:shadow-[3px_3px_0_0_var(--color-magenta)]"
+            >
+              ← 그룹 선택
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            className="rounded-full border-2 border-(--color-ink) bg-(--color-paper) px-3 py-1.5 text-xs font-semibold text-(--color-ink) transition-shadow hover:shadow-[3px_3px_0_0_var(--color-magenta)]"
+          >
+            설정
+          </button>
+        </div>
       </div>
     </header>
   );
