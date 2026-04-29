@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useEval } from '@/store/eval-context';
 import { useApiKey } from '@/hooks/use-api-key';
 import { Chatbot } from './chatbot';
+import { SpeechBubble } from './speech-bubble';
 import type { ChatbotQAItem } from '@/types';
 
 export function ChatbotPanel() {
@@ -48,17 +49,19 @@ export function ChatbotPanel() {
 
   if (loading) {
     return (
-      <section data-component="chatbot-panel" className="p-6 flex flex-col items-center gap-4">
+      <section data-component="chatbot-panel" className="p-8 flex flex-col items-center gap-6">
         <Chatbot pose="thinking" />
-        <p>질문을 준비하는 중…</p>
+        <SpeechBubble>질문을 준비하는 중…</SpeechBubble>
       </section>
     );
   }
   if (errorMsg) {
     return (
-      <section data-component="chatbot-panel" className="p-6 flex flex-col items-center gap-4">
+      <section data-component="chatbot-panel" className="p-8 flex flex-col items-center gap-6">
         <Chatbot pose="thinking" />
-        <p className="text-red-600">질문 생성 실패: {errorMsg}</p>
+        <SpeechBubble>
+          <span className="text-red-600">질문 생성 실패: {errorMsg}</span>
+        </SpeechBubble>
       </section>
     );
   }
@@ -83,25 +86,32 @@ export function ChatbotPanel() {
   }
 
   return (
-    <section data-component="chatbot-panel" className="p-6 flex flex-col items-center gap-4">
-      <Chatbot pose="talking" />
-      <p className="text-sm opacity-70">{idx + 1} / {state.questions.length}</p>
-      <p data-component="question-bubble" className="text-lg font-semibold text-center max-w-xl">
-        {currentQ}
-      </p>
+    <section data-component="chatbot-panel" className="p-8 flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-3">
+        <Chatbot pose="talking" />
+        <p className="text-xs uppercase tracking-wider text-sky-600">
+          질문 {idx + 1} / {state.questions.length}
+        </p>
+      </div>
+
+      {/* keyed on idx so the bubble re-mounts and the entrance animation re-plays each question */}
+      <SpeechBubble key={idx}>
+        <span className="text-lg font-semibold leading-relaxed">{currentQ}</span>
+      </SpeechBubble>
+
       <textarea
         value={draftAnswer}
         onChange={(e) => setDraftAnswer(e.target.value)}
-        className="border rounded p-3 w-full max-w-xl h-32 text-sm"
+        className="border border-slate-300 focus:border-sky-400 focus:ring-2 focus:ring-sky-200 outline-none rounded-xl p-3 w-full max-w-xl h-32 text-sm resize-none"
         placeholder="학생 답변을 받아 적으세요"
       />
       <button
         type="button"
         disabled={!draftAnswer.trim()}
         onClick={next}
-        className="px-4 py-2 bg-black text-white rounded disabled:opacity-50"
+        className="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white rounded-full font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow"
       >
-        {isLast ? '채점 시작' : '다음 질문'}
+        {isLast ? '채점 시작' : '다음 질문 →'}
       </button>
     </section>
   );
