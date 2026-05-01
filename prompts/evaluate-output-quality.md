@@ -40,14 +40,8 @@ You are an expert grader scoring the **output quality** that the film student's 
 
 {{results}}
 
-## Input — student's Q&A about output quality
-
-{{qa}}
-
 ## Output
 
 Respond strictly with this JSON object:
 - `score`: integer 0–25
 - `reasoning`: 2–3 sentences in Korean. Reference one concrete artifact detail.
-
-Use the Q&A to break ties or to surface intent the artifact alone doesn't reveal.

@@ -38,10 +38,6 @@ You are an expert grader scoring **creativity and domain (film & video) connecti
 
 {{submission}}
 
-## Input — student's Q&A about creative direction
-
-{{qa}}
-
 ## Output
 
 Respond strictly with this JSON object:

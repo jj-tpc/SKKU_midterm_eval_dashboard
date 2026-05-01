@@ -1,10 +1,9 @@
 import { runEvaluator } from '../run-evaluator';
 import { iterationResponseSchema } from '../schemas';
-import type { ChatbotQAItem, Submission } from '@/types';
+import type { Submission } from '@/types';
 
 export async function evaluateIteration(
   submission: Submission,
-  qaItem: ChatbotQAItem | undefined,
   apiKey: string
 ) {
   const versionsText = submission.versions
@@ -13,12 +12,9 @@ export async function evaluateIteration(
       (v.changeNote ? `\n[변경사유]\n${v.changeNote}` : '')
     )
     .join('\n\n');
-  const qa = qaItem
-    ? `Q: ${qaItem.question}\nA: ${qaItem.answer || '(미답변)'}`
-    : '(no Q&A captured for this category)';
   return runEvaluator({
     promptName: 'evaluate-iteration',
-    vars: { versions: versionsText, qa },
+    vars: { versions: versionsText },
     schema: iterationResponseSchema,
     apiKey,
   });

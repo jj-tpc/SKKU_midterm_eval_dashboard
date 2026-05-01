@@ -43,17 +43,6 @@ export const SCORE_MAX: Record<ScoreCategory, number> = {
   creativity: 20,
 };
 
-export type ChatbotQAItem = {
-  /** Which rubric category this question is meant to surface signal for. */
-  category: ScoreCategory;
-  question: string;
-  answer: string;
-};
-
-export type ChatbotQA = {
-  questions: ChatbotQAItem[];
-};
-
 export type CategoryScore = {
   score: number;
   max: number;
@@ -76,7 +65,6 @@ export type RequiredElementsResult = {
 export type EvaluationResult = {
   group: Group;
   submission: Submission;
-  chatbotQA: ChatbotQA;
   scores: Record<ScoreCategory, CategoryScore>;
   requiredElements?: RequiredElementsResult;
   totalScore: number;

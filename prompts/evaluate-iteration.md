@@ -39,10 +39,6 @@ You are an expert grader scoring the **iterative refinement process** demonstrat
 
 {{versions}}
 
-## Input — student's Q&A about their iteration approach
-
-{{qa}}
-
 ## Output
 
 Respond strictly with this JSON object:

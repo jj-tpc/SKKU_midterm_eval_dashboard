@@ -32,17 +32,6 @@ export const creativityResponseSchema = z.object({
 
 export const SCORE_CATEGORIES = ['promptDesign', 'outputQuality', 'iteration', 'creativity'] as const;
 
-export const dynamicQuestionsResponseSchema = z.object({
-  questions: z
-    .array(
-      z.object({
-        category: z.enum(SCORE_CATEGORIES),
-        question: z.string().min(1),
-      })
-    )
-    .length(4),
-});
-
 export const cheerMessageResponseSchema = z.object({
   message: z.string().min(1).max(280),
 });

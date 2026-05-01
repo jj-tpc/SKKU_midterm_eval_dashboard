@@ -27,7 +27,6 @@ const sample: EvaluationResult = {
     topicId: 'synopsis',
     versions: [{ label: 'v1', prompt: 'p', result: 'r' }],
   },
-  chatbotQA: { questions: [] },
   scores: {
     promptDesign:  { score: 25, max: 30, reasoning: 'r' },
     outputQuality: { score: 20, max: 25, reasoning: 'r' },
