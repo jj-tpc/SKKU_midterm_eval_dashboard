@@ -6,7 +6,6 @@ import { useEvalStream } from '@/hooks/use-eval-stream';
 import { Header } from '@/components/header';
 import { SettingsModal } from '@/components/settings-modal';
 import { SubmissionForm } from '@/components/submission-form';
-import { ChatbotPanel } from '@/components/chatbot-panel';
 import { ScoreReveal } from '@/components/score-reveal';
 import { GroupSelector } from '@/components/group-selector';
 import { TopicSelector } from '@/components/topic-selector';
@@ -34,10 +33,9 @@ export default function Page() {
       apiKey,
       group: state.submission.group,
       submission: state.submission,
-      chatbotQA: state.chatbotQA,
       forceRefresh: state.forceRefresh,
     });
-  }, [state.phase, state.submission, state.chatbotQA, state.forceRefresh, apiKey, start, dispatch]);
+  }, [state.phase, state.submission, state.forceRefresh, apiKey, start, dispatch]);
 
   return (
     <main className="relative min-h-screen bg-(--color-paper)">
@@ -47,7 +45,6 @@ export default function Page() {
       {state.phase === 'topic' && <TopicSelector />}
 
       {state.phase === 'input' && <SubmissionForm />}
-      {state.phase === 'qa' && <ChatbotPanel />}
       {(state.phase === 'grading' || state.phase === 'reveal' || state.phase === 'done') && <ScoreReveal />}
 
       {state.errorMessage && (

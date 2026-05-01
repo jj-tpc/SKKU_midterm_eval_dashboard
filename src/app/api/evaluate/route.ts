@@ -8,7 +8,7 @@ import { getCachedEvaluation, setCachedEvaluation } from '@/lib/kv-cache';
 import { DEFAULT_MODEL } from '@/lib/run-evaluator';
 import { getTopic } from '@/lib/topics';
 import { SCORE_MAX } from '@/types';
-import type { ChatbotQA, ChatbotQAItem, EvaluationResult, Group, RequiredElementsResult, ScoreCategory, Submission } from '@/types';
+import type { EvaluationResult, Group, RequiredElementsResult, ScoreCategory, Submission } from '@/types';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -18,7 +18,6 @@ const ORDER: ScoreCategory[] = ['promptDesign', 'outputQuality', 'iteration', 'c
 type Body = {
   group: Group;
   submission: Submission;
-  chatbotQA: ChatbotQA;
   forceRefresh?: boolean;
 };
 
@@ -27,10 +26,6 @@ function sse(event: string, data: unknown): string {
 }
 
 function sleep(ms: number) { return new Promise((r) => setTimeout(r, ms)); }
-
-function pickQA(qa: ChatbotQA, category: ScoreCategory): ChatbotQAItem | undefined {
-  return qa.questions.find((q) => q.category === category);
-}
 
 export async function POST(req: Request) {
   const apiKey = req.headers.get('x-openai-key');
@@ -74,10 +69,10 @@ export async function POST(req: Request) {
         const topic = getTopic(body.submission.topicId);
 
         const tasks: Array<{ category: ScoreCategory; promise: Promise<{ score: number; reasoning: string }> }> = [
-          { category: 'promptDesign',  promise: evaluatePromptDesign(body.submission,  pickQA(body.chatbotQA, 'promptDesign'),  apiKey) },
-          { category: 'outputQuality', promise: evaluateOutputQuality(body.submission, pickQA(body.chatbotQA, 'outputQuality'), apiKey) },
-          { category: 'iteration',     promise: evaluateIteration(body.submission,     pickQA(body.chatbotQA, 'iteration'),     apiKey) },
-          { category: 'creativity',    promise: evaluateCreativity(body.submission,    pickQA(body.chatbotQA, 'creativity'),    apiKey) },
+          { category: 'promptDesign',  promise: evaluatePromptDesign(body.submission,  apiKey) },
+          { category: 'outputQuality', promise: evaluateOutputQuality(body.submission, apiKey) },
+          { category: 'iteration',     promise: evaluateIteration(body.submission,     apiKey) },
+          { category: 'creativity',    promise: evaluateCreativity(body.submission,    apiKey) },
         ];
 
         // Run the required-elements check in parallel with the rubric.
@@ -139,7 +134,6 @@ export async function POST(req: Request) {
           const evalResult: EvaluationResult = {
             group: body.group,
             submission: body.submission,
-            chatbotQA: body.chatbotQA,
             scores: finalScores,
             requiredElements,
             totalScore: total,

@@ -1,13 +1,12 @@
 'use client';
 import { useCallback } from 'react';
 import { useEval } from '@/store/eval-context';
-import type { ChatbotQA, Group, Submission } from '@/types';
+import type { Group, Submission } from '@/types';
 
 type StartArgs = {
   apiKey: string;
   group: Group;
   submission: Submission;
-  chatbotQA: ChatbotQA;
   forceRefresh?: boolean;
 };
 
@@ -36,7 +35,6 @@ export function useEvalStream() {
       body: JSON.stringify({
         group: args.group,
         submission: args.submission,
-        chatbotQA: args.chatbotQA,
         forceRefresh: args.forceRefresh ?? false,
       }),
     });
