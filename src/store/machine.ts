@@ -44,6 +44,7 @@ export type Action =
   | { type: 'COMPLETE'; payload: { totalScore: number } }
   | { type: 'CHEER'; payload: string }
   | { type: 'ERROR'; payload: string }
+  | { type: 'CLEAR_ERROR' }
   | { type: 'RESET' };
 
 export function reducer(state: State, action: Action): State {
@@ -57,7 +58,7 @@ export function reducer(state: State, action: Action): State {
     case 'SET_FORCE_REFRESH':
       return { ...state, forceRefresh: action.payload };
     case 'SUBMIT_FORM':
-      return { ...state, submission: action.payload, group: action.payload.group, phase: 'grading' };
+      return { ...state, submission: action.payload, group: action.payload.group, phase: 'grading', errorMessage: null };
     case 'CACHE_STATUS':
       return { ...state, cacheHit: action.payload };
     case 'RECEIVE_SCORE': {
@@ -76,6 +77,8 @@ export function reducer(state: State, action: Action): State {
       return { ...state, cheerMessage: action.payload };
     case 'ERROR':
       return { ...state, errorMessage: action.payload };
+    case 'CLEAR_ERROR':
+      return { ...state, errorMessage: null };
     case 'RESET':
       return { ...initialState, forceRefresh: state.forceRefresh };
   }
