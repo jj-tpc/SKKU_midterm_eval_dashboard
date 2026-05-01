@@ -29,6 +29,9 @@ export default function Page() {
       setSettingsOpen(true);
       return;
     }
+    // Stale errors from a prior failed attempt (e.g. missing key, 401) would
+    // otherwise stay pinned to the corner alert across the new run.
+    dispatch({ type: 'CLEAR_ERROR' });
     start({
       apiKey,
       group: state.submission.group,
